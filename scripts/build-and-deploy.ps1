@@ -2,8 +2,10 @@
 # Arcas Champions - Build and Deploy Script
 # ============================================
 #
-# This script builds the game and uploads to Steam.
-# It runs as a background process and updates status.txt for monitoring.
+# This script:
+#   1. Pulls latest code from deploy/steam-testing branch
+#   2. Builds the game (BuildCookRun)
+#   3. Uploads to Steam Demo testing branch
 #
 # Trigger command (run via SSH):
 #   Invoke-WmiMethod -Class Win32_Process -Name Create -ArgumentList 'cmd /c C:\A\Scripts\build.bat'
@@ -22,6 +24,7 @@ $statusFile = "C:\A\status.txt"
 # CONFIGURATION - ARCAS CHAMPIONS
 # ============================================
 $UE5Path = "C:\UE5.5"
+$RepoPath = "C:\A\ApeShooter"
 $ProjectPath = "C:\A\ApeShooter\NewApeShooter\NewApeShooter.uproject"
 $TargetName = "ArcasChampionsSteam"
 $Platform = "Win64"
@@ -29,6 +32,7 @@ $Config = "Shipping"
 $BuildDir = "C:\A\Builds\ArcasChampionsSteam"
 $SteamVDF = "C:\SteamCMD\app_build_3487030.vdf"
 $SteamUser = "dandadevarcas"
+$GitBranch = "deploy/steam-testing"
 # ============================================
 
 function Log {
@@ -46,15 +50,72 @@ function UpdateStatus {
 }
 
 # ============================================
-# BUILD PHASE
+# GIT PULL PHASE
 # ============================================
 
-UpdateStatus 'BUILDING'
+UpdateStatus 'PULLING'
 Log '=========================================='
 Log 'ARCAS CHAMPIONS BUILD AND DEPLOY'
 Log '=========================================='
 Log "Timestamp: $timestamp"
 Log "Log file: $logFile"
+Log ''
+
+Log '=========================================='
+Log 'PULLING LATEST CODE'
+Log '=========================================='
+Log ''
+Log "Repository: $RepoPath"
+Log "Branch: $GitBranch"
+Log ''
+
+# Change to repo directory and pull
+Push-Location $RepoPath
+
+# Fetch and checkout the branch
+Log 'Fetching from origin...'
+$fetchOutput = & git fetch origin 2>&1
+$fetchOutput | ForEach-Object { Log $_ }
+
+Log ''
+Log "Checking out $GitBranch..."
+$checkoutOutput = & git checkout $GitBranch 2>&1
+$checkoutOutput | ForEach-Object { Log $_ }
+
+Log ''
+Log 'Pulling latest changes...'
+$pullOutput = & git pull origin $GitBranch 2>&1
+$pullExitCode = $LASTEXITCODE
+$pullOutput | ForEach-Object { Log $_ }
+
+if ($pullExitCode -ne 0) {
+    UpdateStatus 'PULL_FAILED'
+    Log ''
+    Log 'GIT PULL FAILED!'
+    Log 'Check log for errors.'
+    Pop-Location
+    exit 1
+}
+
+# Get current commit info
+$commitHash = & git rev-parse --short HEAD
+$commitMsg = & git log -1 --pretty=%s
+
+Log ''
+Log "Current commit: $commitHash"
+Log "Message: $commitMsg"
+Log ''
+
+Pop-Location
+
+# ============================================
+# BUILD PHASE
+# ============================================
+
+UpdateStatus 'BUILDING'
+Log '=========================================='
+Log 'BUILDING GAME'
+Log '=========================================='
 Log ''
 Log "Project: $ProjectPath"
 Log "Target: $TargetName"
@@ -70,7 +131,8 @@ $buildStart = Get-Date
 $buildCmd = "$UE5Path\Engine\Build\BatchFiles\RunUAT.bat"
 $buildArgs = "BuildCookRun -project=`"$ProjectPath`" -target=$TargetName -platform=$Platform -clientconfig=$Config -build -cook -stage -pak -archive -archivedirectory=`"$BuildDir`""
 
-Log "Command: $buildCmd $buildArgs"
+Log "Command: $buildCmd"
+Log "Args: $buildArgs"
 Log ''
 
 # Run build and capture output
@@ -146,6 +208,7 @@ Log 'BUILD AND DEPLOY COMPLETE!'
 Log '=========================================='
 Log ''
 Log "Total time: $($totalDuration.Hours)h $($totalDuration.Minutes)m $($totalDuration.Seconds)s"
+Log "Git commit: $commitHash - $commitMsg"
 Log ''
 Log 'Build is now live on Steam Demo (3487030) testing branch'
 Log 'Branch password: PrimeTester262'

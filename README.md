@@ -5,11 +5,34 @@ Automated UE5 build and Steam deployment pipeline for Arcas Champions.
 **Stack:** GCP Windows VM + UE5.5 (source) + SteamCMD + SSH
 
 ```
-┌─────────────┐      SSH       ┌─────────────────┐    SteamCMD    ┌─────────────┐
-│   Mac/PC    │ ────────────▶  │  GCP Windows VM │ ────────────▶  │ Steam Demo  │
-│ (trigger)   │   1 command    │  (builds game)  │    upload      │  (testing)  │
-└─────────────┘                └─────────────────┘                └─────────────┘
+┌─────────────┐      SSH       ┌─────────────────┐                ┌─────────────┐
+│   Mac/PC    │ ──────────────▶│  GCP Windows VM │───────────────▶│ Steam Demo  │
+│  (trigger)  │   1 command    │                 │    SteamCMD    │  (testing)  │
+└─────────────┘                │  1. git pull    │                └─────────────┘
+                               │  2. BuildCookRun│
+                               │  3. Upload      │
+                               └─────────────────┘
 ```
+
+---
+
+## Branch Strategy
+
+```
+feature/* ──▶ deploy/steam-testing ──▶ (automated build) ──▶ main (when stable)
+```
+
+| Branch | Purpose | Auto-build? |
+|--------|---------|-------------|
+| `main` | Stable code (don't touch) | NO |
+| `deploy/steam-testing` | Active development | YES |
+| `beta`, `early-access` | Legacy | NO |
+
+**Workflow:**
+1. Create feature branch from `deploy/steam-testing`
+2. Work on feature, test locally
+3. Merge to `deploy/steam-testing`
+4. Trigger automated build → Steam testing branch
 
 ---
 
@@ -28,7 +51,7 @@ ssh -i ~/.ssh/arcas_build_key daniel@34.158.27.129 \
 ssh -i ~/.ssh/arcas_build_key daniel@34.158.27.129 "type C:\\A\\status.txt"
 ```
 
-**Status values:** `IDLE` | `BUILDING` | `UPLOADING` | `COMPLETE` | `BUILD_FAILED` | `UPLOAD_FAILED`
+**Status values:** `IDLE` | `PULLING` | `BUILDING` | `UPLOADING` | `COMPLETE` | `PULL_FAILED` | `BUILD_FAILED` | `UPLOAD_FAILED`
 
 ### Monitor Progress
 
@@ -104,12 +127,13 @@ C:\
 ### What Happens
 
 1. **Trigger** - SSH command starts `build.bat` as detached process
-2. **Build** - RunUAT.bat BuildCookRun (~2-2.5 hours)
+2. **Pull** - Fetches and pulls latest from `deploy/steam-testing` branch
+3. **Build** - RunUAT.bat BuildCookRun (~2-2.5 hours)
    - Compile (~30-45 min)
    - Cook assets (~60-90 min)
    - Stage, Pak, Archive (~15 min)
-3. **Upload** - SteamCMD uploads to Demo `testing` branch (~5-10 min)
-4. **Complete** - Status updated, build live on Steam
+4. **Upload** - SteamCMD uploads to Demo `testing` branch (~5-10 min)
+5. **Complete** - Status updated, build live on Steam (includes git commit hash)
 
 ### Build Times
 

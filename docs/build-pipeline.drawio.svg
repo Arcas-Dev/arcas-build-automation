@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="950px" height="520px" viewBox="-0.5 -0.5 950 520" style="background-color: rgb(255, 255, 255);">
+  <defs/>
+
+  <!-- Title -->
+  <text x="475" y="30" font-family="Helvetica" font-size="20" font-weight="bold" text-anchor="middle" fill="#333">Arcas Build Automation Pipeline</text>
+  <text x="475" y="50" font-family="Helvetica" font-size="12" text-anchor="middle" fill="#666">SSH → Git Pull → BuildCookRun → Steam Upload</text>
+
+  <!-- TRIGGER SECTION -->
+  <rect x="20" y="80" width="200" height="160" rx="5" ry="5" fill="#f0f7ff" stroke="#6c8ebf" stroke-width="1" stroke-dasharray="4"/>
+  <text x="120" y="100" font-family="Helvetica" font-size="11" font-weight="bold" text-anchor="middle" fill="#6c8ebf">YOUR MACHINE</text>
+
+  <!-- Mac/PC Box -->
+  <rect x="45" y="115" width="150" height="60" rx="8" ry="8" fill="#dae8fc" stroke="#6c8ebf" stroke-width="2"/>
+  <text x="120" y="140" font-family="Helvetica" font-size="13" font-weight="bold" text-anchor="middle" fill="#333">Mac / PC</text>
+  <text x="120" y="158" font-family="Helvetica" font-size="10" text-anchor="middle" fill="#666">Claude Code / Terminal</text>
+
+  <!-- SSH Command -->
+  <rect x="35" y="185" width="170" height="45" rx="4" ry="4" fill="#fff" stroke="#999" stroke-width="1"/>
+  <text x="120" y="202" font-family="Courier" font-size="9" text-anchor="middle" fill="#333">ssh ... "Invoke-WmiMethod</text>
+  <text x="120" y="215" font-family="Courier" font-size="9" text-anchor="middle" fill="#333">... build.bat"</text>
+
+  <!-- Arrow to VM -->
+  <path d="M 220 145 L 270 145" fill="none" stroke="#333" stroke-width="2"/>
+  <path d="M 275 145 L 268 141 L 270 145 L 268 149 Z" fill="#333"/>
+  <text x="247" y="138" font-family="Helvetica" font-size="10" text-anchor="middle" fill="#333">SSH</text>
+
+  <!-- GCP VM SECTION -->
+  <rect x="280" y="70" width="440" height="280" rx="5" ry="5" fill="#fff7e6" stroke="#d79b00" stroke-width="1" stroke-dasharray="4"/>
+  <text x="500" y="90" font-family="Helvetica" font-size="11" font-weight="bold" text-anchor="middle" fill="#d79b00">GCP WINDOWS VM (arcas-build-server)</text>
+
+  <!-- Step 1: Git Pull -->
+  <rect x="300" y="110" width="120" height="70" rx="8" ry="8" fill="#e1d5e7" stroke="#9673a6" stroke-width="2"/>
+  <text x="360" y="135" font-family="Helvetica" font-size="12" font-weight="bold" text-anchor="middle" fill="#333">1. Git Pull</text>
+  <text x="360" y="152" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">deploy/steam-testing</text>
+  <text x="360" y="168" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">~10 seconds</text>
+
+  <!-- Arrow -->
+  <path d="M 420 145 L 450 145" fill="none" stroke="#333" stroke-width="2"/>
+  <path d="M 455 145 L 448 141 L 450 145 L 448 149 Z" fill="#333"/>
+
+  <!-- Step 2: Build -->
+  <rect x="460" y="110" width="120" height="70" rx="8" ry="8" fill="#ffe6cc" stroke="#d79b00" stroke-width="2"/>
+  <text x="520" y="132" font-family="Helvetica" font-size="12" font-weight="bold" text-anchor="middle" fill="#333">2. Build</text>
+  <text x="520" y="149" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">BuildCookRun</text>
+  <text x="520" y="166" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">~2-3 hours (full)</text>
+
+  <!-- Arrow -->
+  <path d="M 580 145 L 610 145" fill="none" stroke="#333" stroke-width="2"/>
+  <path d="M 615 145 L 608 141 L 610 145 L 608 149 Z" fill="#333"/>
+
+  <!-- Step 3: Upload -->
+  <rect x="620" y="110" width="120" height="70" rx="8" ry="8" fill="#d5e8d4" stroke="#82b366" stroke-width="2"/>
+  <text x="680" y="132" font-family="Helvetica" font-size="12" font-weight="bold" text-anchor="middle" fill="#333">3. Upload</text>
+  <text x="680" y="149" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">SteamCMD</text>
+  <text x="680" y="166" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">~5-10 minutes</text>
+
+  <!-- VM Details Box -->
+  <rect x="300" y="200" width="180" height="135" rx="5" ry="5" fill="#fff" stroke="#ccc" stroke-width="1"/>
+  <text x="390" y="220" font-family="Helvetica" font-size="10" font-weight="bold" text-anchor="middle" fill="#333">VM Details</text>
+
+  <text x="310" y="240" font-family="Helvetica" font-size="9" fill="#666">IP:</text>
+  <text x="360" y="240" font-family="Courier" font-size="9" fill="#333">34.158.27.129</text>
+
+  <text x="310" y="256" font-family="Helvetica" font-size="9" fill="#666">Type:</text>
+  <text x="360" y="256" font-family="Courier" font-size="9" fill="#333">n2-standard-16</text>
+
+  <text x="310" y="272" font-family="Helvetica" font-size="9" fill="#666">RAM:</text>
+  <text x="360" y="272" font-family="Courier" font-size="9" fill="#333">64 GB</text>
+
+  <text x="310" y="288" font-family="Helvetica" font-size="9" fill="#666">Disk:</text>
+  <text x="360" y="288" font-family="Courier" font-size="9" fill="#333">500 GB SSD</text>
+
+  <text x="310" y="304" font-family="Helvetica" font-size="9" fill="#666">Engine:</text>
+  <text x="360" y="304" font-family="Courier" font-size="9" fill="#333">UE5.5 (source)</text>
+
+  <text x="310" y="320" font-family="Helvetica" font-size="9" fill="#666">Target:</text>
+  <text x="360" y="320" font-family="Courier" font-size="9" fill="#333">ArcasChampionsSteam</text>
+
+  <!-- Paths Box -->
+  <rect x="500" y="200" width="200" height="135" rx="5" ry="5" fill="#fff" stroke="#ccc" stroke-width="1"/>
+  <text x="600" y="220" font-family="Helvetica" font-size="10" font-weight="bold" text-anchor="middle" fill="#333">Key Paths</text>
+
+  <text x="510" y="240" font-family="Courier" font-size="8" fill="#333">C:\UE5.5\</text>
+  <text x="510" y="253" font-family="Helvetica" font-size="8" fill="#666">  Engine (source build)</text>
+
+  <text x="510" y="270" font-family="Courier" font-size="8" fill="#333">C:\A\ApeShooter\</text>
+  <text x="510" y="283" font-family="Helvetica" font-size="8" fill="#666">  Game project repo</text>
+
+  <text x="510" y="300" font-family="Courier" font-size="8" fill="#333">C:\A\Builds\</text>
+  <text x="510" y="313" font-family="Helvetica" font-size="8" fill="#666">  Build output (~5 GB)</text>
+
+  <text x="510" y="330" font-family="Courier" font-size="8" fill="#333">C:\A\status.txt</text>
+
+  <!-- Arrow to Steam -->
+  <path d="M 740 145 L 790 145" fill="none" stroke="#333" stroke-width="2"/>
+  <path d="M 795 145 L 788 141 L 790 145 L 788 149 Z" fill="#333"/>
+
+  <!-- STEAM SECTION -->
+  <rect x="800" y="80" width="130" height="160" rx="5" ry="5" fill="#e8f4e8" stroke="#82b366" stroke-width="1" stroke-dasharray="4"/>
+  <text x="865" y="100" font-family="Helvetica" font-size="11" font-weight="bold" text-anchor="middle" fill="#82b366">STEAM</text>
+
+  <!-- Steam Box -->
+  <rect x="815" y="115" width="100" height="70" rx="8" ry="8" fill="#d5e8d4" stroke="#82b366" stroke-width="2"/>
+  <text x="865" y="140" font-family="Helvetica" font-size="12" font-weight="bold" text-anchor="middle" fill="#333">Demo App</text>
+  <text x="865" y="157" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">ID: 3487030</text>
+  <text x="865" y="172" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">testing branch</text>
+
+  <!-- Password note -->
+  <text x="865" y="205" font-family="Helvetica" font-size="8" text-anchor="middle" fill="#666">Password:</text>
+  <text x="865" y="218" font-family="Courier" font-size="8" text-anchor="middle" fill="#333">PrimeTester262</text>
+
+  <!-- STATUS SECTION -->
+  <rect x="20" y="370" width="910" height="130" rx="5" ry="5" fill="#fafafa" stroke="#ddd" stroke-width="1"/>
+  <text x="475" y="395" font-family="Helvetica" font-size="12" font-weight="bold" text-anchor="middle" fill="#333">Status Values &amp; Monitoring</text>
+
+  <!-- Status boxes -->
+  <rect x="40" y="415" width="70" height="30" rx="4" ry="4" fill="#f5f5f5" stroke="#999" stroke-width="1"/>
+  <text x="75" y="435" font-family="Courier" font-size="10" text-anchor="middle" fill="#666">IDLE</text>
+
+  <path d="M 115 430 L 135 430" fill="none" stroke="#999" stroke-width="1"/>
+  <path d="M 140 430 L 135 427 L 135 433 Z" fill="#999"/>
+
+  <rect x="145" y="415" width="80" height="30" rx="4" ry="4" fill="#e1d5e7" stroke="#9673a6" stroke-width="1"/>
+  <text x="185" y="435" font-family="Courier" font-size="10" text-anchor="middle" fill="#333">PULLING</text>
+
+  <path d="M 230 430 L 250 430" fill="none" stroke="#999" stroke-width="1"/>
+  <path d="M 255 430 L 250 427 L 250 433 Z" fill="#999"/>
+
+  <rect x="260" y="415" width="80" height="30" rx="4" ry="4" fill="#ffe6cc" stroke="#d79b00" stroke-width="1"/>
+  <text x="300" y="435" font-family="Courier" font-size="10" text-anchor="middle" fill="#333">BUILDING</text>
+
+  <path d="M 345 430 L 365 430" fill="none" stroke="#999" stroke-width="1"/>
+  <path d="M 370 430 L 365 427 L 365 433 Z" fill="#999"/>
+
+  <rect x="375" y="415" width="90" height="30" rx="4" ry="4" fill="#d5e8d4" stroke="#82b366" stroke-width="1"/>
+  <text x="420" y="435" font-family="Courier" font-size="10" text-anchor="middle" fill="#333">UPLOADING</text>
+
+  <path d="M 470 430 L 490 430" fill="none" stroke="#999" stroke-width="1"/>
+  <path d="M 495 430 L 490 427 L 490 433 Z" fill="#999"/>
+
+  <rect x="500" y="415" width="85" height="30" rx="4" ry="4" fill="#d5e8d4" stroke="#82b366" stroke-width="2"/>
+  <text x="542" y="435" font-family="Courier" font-size="10" text-anchor="middle" fill="#333">COMPLETE</text>
+
+  <!-- Error states -->
+  <rect x="640" y="415" width="100" height="30" rx="4" ry="4" fill="#f8cecc" stroke="#b85450" stroke-width="1"/>
+  <text x="690" y="435" font-family="Courier" font-size="9" text-anchor="middle" fill="#333">*_FAILED</text>
+
+  <!-- Monitor commands -->
+  <text x="40" y="475" font-family="Helvetica" font-size="10" fill="#666">Check status:</text>
+  <text x="120" y="475" font-family="Courier" font-size="9" fill="#333">ssh ... "type C:\A\status.txt"</text>
+
+  <text x="450" y="475" font-family="Helvetica" font-size="10" fill="#666">View log:</text>
+  <text x="510" y="475" font-family="Courier" font-size="9" fill="#333">ssh ... "Get-Content C:\A\Logs\build-*.log -Tail 30"</text>
+
+</svg>

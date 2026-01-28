@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1000px" height="600px" viewBox="-0.5 -0.5 1000 600" style="background-color: rgb(255, 255, 255);">
+  <defs/>
+
+  <!-- Title -->
+  <text x="500" y="35" font-family="Helvetica" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">Arcas Autonomous World - Vision</text>
+  <text x="500" y="58" font-family="Helvetica" font-size="14" text-anchor="middle" fill="#666">Player-Governed Game Development Pipeline</text>
+
+  <!-- Row 1: Players & Voting -->
+
+  <!-- Players Box -->
+  <rect x="40" y="100" width="140" height="80" rx="10" ry="10" fill="#dae8fc" stroke="#6c8ebf" stroke-width="2"/>
+  <text x="110" y="135" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Players</text>
+  <text x="110" y="155" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Hold $ARCAS</text>
+  <text x="110" y="170" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Play &amp; Earn Rank</text>
+
+  <!-- Arrow 1 -->
+  <path d="M 180 140 L 225 140" fill="none" stroke="#333" stroke-width="2"/>
+  <path d="M 230 140 L 223 136 L 225 140 L 223 144 Z" fill="#333"/>
+
+  <!-- Voting Box -->
+  <rect x="235" y="100" width="140" height="80" rx="10" ry="10" fill="#e1d5e7" stroke="#9673a6" stroke-width="2"/>
+  <text x="305" y="130" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Governance</text>
+  <text x="305" y="150" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Vote on Changes</text>
+  <text x="305" y="165" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Buffs/Nerfs/Features</text>
+
+  <!-- Arrow 2 -->
+  <path d="M 375 140 L 420 140" fill="none" stroke="#333" stroke-width="2"/>
+  <path d="M 425 140 L 418 136 L 420 140 L 418 144 Z" fill="#333"/>
+
+  <!-- Vote Passes Box -->
+  <rect x="430" y="100" width="140" height="80" rx="10" ry="10" fill="#d5e8d4" stroke="#82b366" stroke-width="2"/>
+  <text x="500" y="130" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Vote Passes</text>
+  <text x="500" y="150" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">On-Chain Record</text>
+  <text x="500" y="165" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Smart Contract</text>
+
+  <!-- Row 2: AI & Code -->
+
+  <!-- Arrow down from Vote -->
+  <path d="M 500 180 L 500 220" fill="none" stroke="#333" stroke-width="2"/>
+  <path d="M 500 225 L 496 218 L 500 220 L 504 218 Z" fill="#333"/>
+
+  <!-- AI Agent Box -->
+  <rect x="430" y="230" width="140" height="80" rx="10" ry="10" fill="#fff2cc" stroke="#d6b656" stroke-width="2"/>
+  <text x="500" y="260" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">AI Agent</text>
+  <text x="500" y="280" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Claude Code</text>
+  <text x="500" y="295" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Generates Changes</text>
+
+  <!-- Arrow to Code -->
+  <path d="M 570 270 L 615 270" fill="none" stroke="#333" stroke-width="2"/>
+  <path d="M 620 270 L 613 266 L 615 270 L 613 274 Z" fill="#333"/>
+
+  <!-- Code Changes Box -->
+  <rect x="625" y="230" width="140" height="80" rx="10" ry="10" fill="#f5f5f5" stroke="#666666" stroke-width="2"/>
+  <text x="695" y="260" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Code Changes</text>
+  <text x="695" y="280" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">UE5 C++/Blueprints</text>
+  <text x="695" y="295" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Push to Git</text>
+
+  <!-- Row 3: Build & Deploy -->
+
+  <!-- Arrow down from Code -->
+  <path d="M 695 310 L 695 350" fill="none" stroke="#333" stroke-width="2"/>
+  <path d="M 695 355 L 691 348 L 695 350 L 699 348 Z" fill="#333"/>
+
+  <!-- GCP Build Box -->
+  <rect x="625" y="360" width="140" height="80" rx="10" ry="10" fill="#ffe6cc" stroke="#d79b00" stroke-width="2"/>
+  <text x="695" y="390" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">GCP Build VM</text>
+  <text x="695" y="410" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">git pull + BuildCookRun</text>
+  <text x="695" y="425" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">~2-3 hours</text>
+
+  <!-- Arrow to Steam -->
+  <path d="M 765 400 L 810 400" fill="none" stroke="#333" stroke-width="2"/>
+  <path d="M 815 400 L 808 396 L 810 400 L 808 404 Z" fill="#333"/>
+
+  <!-- Steam Box -->
+  <rect x="820" y="360" width="140" height="80" rx="10" ry="10" fill="#dae8fc" stroke="#6c8ebf" stroke-width="2"/>
+  <text x="890" y="390" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Steam</text>
+  <text x="890" y="410" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Testing Branch</text>
+  <text x="890" y="425" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Auto-Deploy</text>
+
+  <!-- Row 4: Back to Players -->
+
+  <!-- Arrow down from Steam -->
+  <path d="M 890 440 L 890 480" fill="none" stroke="#333" stroke-width="2"/>
+  <path d="M 890 485 L 886 478 L 890 480 L 894 478 Z" fill="#333"/>
+
+  <!-- Updated Game Box -->
+  <rect x="820" y="490" width="140" height="70" rx="10" ry="10" fill="#d5e8d4" stroke="#82b366" stroke-width="2"/>
+  <text x="890" y="520" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Updated Game</text>
+  <text x="890" y="540" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Players Test Changes</text>
+
+  <!-- Curved arrow back to Players -->
+  <path d="M 820 525 Q 500 580 110 180" fill="none" stroke="#82b366" stroke-width="2" stroke-dasharray="5,5"/>
+  <path d="M 110 175 L 106 184 L 110 180 L 114 184 Z" fill="#82b366"/>
+
+  <!-- Loop label -->
+  <text x="450" y="555" font-family="Helvetica" font-size="12" font-style="italic" text-anchor="middle" fill="#82b366">Feedback Loop - Players vote on next changes</text>
+
+  <!-- Side panel: Current Status -->
+  <rect x="40" y="230" width="160" height="210" rx="5" ry="5" fill="#f8f8f8" stroke="#ccc" stroke-width="1"/>
+  <text x="120" y="255" font-family="Helvetica" font-size="12" font-weight="bold" text-anchor="middle" fill="#333">Implementation Status</text>
+
+  <text x="50" y="280" font-family="Helvetica" font-size="11" fill="#82b366">✓</text>
+  <text x="65" y="280" font-family="Helvetica" font-size="11" fill="#333">GCP Build VM</text>
+
+  <text x="50" y="300" font-family="Helvetica" font-size="11" fill="#82b366">✓</text>
+  <text x="65" y="300" font-family="Helvetica" font-size="11" fill="#333">UE5 from Source</text>
+
+  <text x="50" y="320" font-family="Helvetica" font-size="11" fill="#82b366">✓</text>
+  <text x="65" y="320" font-family="Helvetica" font-size="11" fill="#333">Git Pull Automation</text>
+
+  <text x="50" y="340" font-family="Helvetica" font-size="11" fill="#82b366">✓</text>
+  <text x="65" y="340" font-family="Helvetica" font-size="11" fill="#333">Steam Auto-Deploy</text>
+
+  <text x="50" y="360" font-family="Helvetica" font-size="11" fill="#82b366">✓</text>
+  <text x="65" y="360" font-family="Helvetica" font-size="11" fill="#333">SSH Trigger</text>
+
+  <line x1="50" y1="375" x2="190" y2="375" stroke="#ccc" stroke-width="1"/>
+
+  <text x="50" y="395" font-family="Helvetica" font-size="11" fill="#d79b00">○</text>
+  <text x="65" y="395" font-family="Helvetica" font-size="11" fill="#666">AI Code Generation</text>
+
+  <text x="50" y="415" font-family="Helvetica" font-size="11" fill="#d79b00">○</text>
+  <text x="65" y="415" font-family="Helvetica" font-size="11" fill="#666">Voting Smart Contract</text>
+
+  <text x="50" y="435" font-family="Helvetica" font-size="11" fill="#d79b00">○</text>
+  <text x="65" y="435" font-family="Helvetica" font-size="11" fill="#666">Edgegap Server Deploy</text>
+
+</svg>

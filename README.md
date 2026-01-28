@@ -36,6 +36,17 @@ feature/* ──▶ deploy/steam-testing ──▶ (automated build) ──▶ m
 
 ---
 
+## Status: Fully Working ✅
+
+**Last tested:** 2026-01-28
+- Git pull from `deploy/steam-testing` ✅
+- Full BuildCookRun ✅
+- Steam upload to Demo testing branch ✅
+- Incremental build time: ~8 minutes
+- Full rebuild time: ~2-3 hours
+
+---
+
 ## Quick Start
 
 ### Start a Build
@@ -151,13 +162,27 @@ C:\
 
 ```
 arcas-build-automation/
-├── README.md                 # This file
+├── README.md                       # This file
+├── vision-autonomous-world.drawio.svg  # Big picture - player governance vision
 ├── scripts/
-│   ├── build-and-deploy.ps1  # Main PowerShell script (runs on VM)
-│   └── build.bat             # Batch wrapper
+│   ├── build-and-deploy.ps1        # Main PowerShell script (runs on VM)
+│   └── build.bat                   # Batch wrapper
 └── docs/
-    └── setup-guide.md        # Full setup guide (GCP, UE5, Steam)
+    ├── setup-guide.md              # Full setup guide (GCP, UE5, Steam)
+    └── build-pipeline.drawio.svg   # Current pipeline diagram
 ```
+
+## Diagrams
+
+### Vision: Autonomous World
+![Vision Diagram](vision-autonomous-world.drawio.svg)
+
+The full vision: Players vote → AI generates code → Build deploys → Players test → Loop
+
+### Current: Build Pipeline
+![Pipeline Diagram](docs/build-pipeline.drawio.svg)
+
+What's working now: SSH trigger → Git pull → BuildCookRun → Steam upload
 
 ---
 

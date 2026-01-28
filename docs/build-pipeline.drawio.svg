@@ -34,7 +34,7 @@
   <rect x="300" y="110" width="120" height="70" rx="8" ry="8" fill="#e1d5e7" stroke="#9673a6" stroke-width="2"/>
   <text x="360" y="135" font-family="Helvetica" font-size="12" font-weight="bold" text-anchor="middle" fill="#333">1. Git Pull</text>
   <text x="360" y="152" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">deploy/steam-testing</text>
-  <text x="360" y="168" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">~10 seconds</text>
+  <text x="360" y="168" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">~5 seconds</text>
 
   <!-- Arrow -->
   <path d="M 420 145 L 450 145" fill="none" stroke="#333" stroke-width="2"/>
@@ -44,7 +44,7 @@
   <rect x="460" y="110" width="120" height="70" rx="8" ry="8" fill="#ffe6cc" stroke="#d79b00" stroke-width="2"/>
   <text x="520" y="132" font-family="Helvetica" font-size="12" font-weight="bold" text-anchor="middle" fill="#333">2. Build</text>
   <text x="520" y="149" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">BuildCookRun</text>
-  <text x="520" y="166" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">~2-3 hours (full)</text>
+  <text x="520" y="166" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">~10 min (incremental)</text>
 
   <!-- Arrow -->
   <path d="M 580 145 L 610 145" fill="none" stroke="#333" stroke-width="2"/>
@@ -70,7 +70,7 @@
   <text x="360" y="272" font-family="Courier" font-size="9" fill="#333">64 GB</text>
 
   <text x="310" y="288" font-family="Helvetica" font-size="9" fill="#666">Disk:</text>
-  <text x="360" y="288" font-family="Courier" font-size="9" fill="#333">500 GB SSD</text>
+  <text x="360" y="288" font-family="Courier" font-size="9" fill="#333">1 TB SSD</text>
 
   <text x="310" y="304" font-family="Helvetica" font-size="9" fill="#666">Engine:</text>
   <text x="360" y="304" font-family="Courier" font-size="9" fill="#333">UE5.5 (source)</text>

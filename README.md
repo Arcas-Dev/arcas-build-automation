@@ -42,8 +42,8 @@ feature/* ──▶ deploy/steam-testing ──▶ (automated build) ──▶ m
 - Git pull from `deploy/steam-testing` ✅
 - Full BuildCookRun ✅
 - Steam upload to Demo testing branch ✅
-- Incremental build time: ~8 minutes
-- Full rebuild time: ~2-3 hours
+- Incremental build time: ~10 minutes
+- Full rebuild time: ~2-3 hours (rare)
 
 ---
 
@@ -88,7 +88,7 @@ ssh -i ~/.ssh/arcas_build_key daniel@34.158.27.129 "tasklist | findstr /i dotnet
 | **Zone** | europe-west6-a |
 | **External IP** | 34.158.27.129 |
 | **Machine Type** | n2-standard-16 (64GB RAM) |
-| **Disk** | 500GB SSD |
+| **Disk** | 1TB SSD |
 | **SSH User** | daniel |
 | **SSH Key** | ~/.ssh/arcas_build_key |
 
@@ -139,7 +139,7 @@ C:\
 
 1. **Trigger** - SSH command starts `build.bat` as detached process
 2. **Pull** - Fetches and pulls latest from `deploy/steam-testing` branch
-3. **Build** - RunUAT.bat BuildCookRun (~2-2.5 hours)
+3. **Build** - RunUAT.bat BuildCookRun (~10 min incremental, 2-3h full)
    - Compile (~30-45 min)
    - Cook assets (~60-90 min)
    - Stage, Pak, Archive (~15 min)
@@ -148,13 +148,11 @@ C:\
 
 ### Build Times
 
-| Phase | Duration |
-|-------|----------|
-| Compile | 30-45 min |
-| Cook | 60-90 min |
-| Package | 10-15 min |
+| Type | Duration |
+|------|----------|
+| **Incremental** (typical) | ~10 minutes |
+| Full rebuild | ~2-3 hours |
 | Upload | 5-10 min |
-| **Total** | **~2-3 hours** |
 
 ---
 
@@ -177,7 +175,7 @@ arcas-build-automation/
 ### Vision: Autonomous World
 ![Vision Diagram](vision-autonomous-world.drawio.svg)
 
-The full vision: Players vote → AI generates code → Build deploys → Players test → Loop
+The full vision: Developers define rules → Players compete & vote in-game → AI generates code → Build deploys → Cycle repeats
 
 ### Current: Build Pipeline
 ![Pipeline Diagram](docs/build-pipeline.drawio.svg)
@@ -240,7 +238,7 @@ This pipeline can be adapted for any UE5 game with Steam deployment. See [docs/s
 - **UE5 from Source** - Required if using `CustomConfig` or custom build environments
 - **GCP Account** - Or any Windows VM provider (AWS, Azure, etc.)
 - **Steam Partner Access** - With builder account permissions
-- **~750GB disk** - UE5 source + project + builds
+- **~1TB disk** - UE5 source + project + builds
 
 ### Estimated Setup Time
 
@@ -277,9 +275,9 @@ UE5 source needs ~200GB, builds need ~10-50GB each. Use 750GB+ disk.
 |----------|------|
 | VM (on-demand) | ~$0.76/hr |
 | VM (spot) | ~$0.23/hr |
-| 500GB SSD | ~$85/month |
-| **Per build (on-demand)** | **~$2.30** |
-| **Per build (spot)** | **~$0.70** |
+| 1TB SSD | ~$170/month |
+| **Per incremental build** | **~$0.13** (10 min) |
+| **Per full rebuild** | **~$2.30** (3 hours) |
 
 **Tip:** Stop VM when not building.
 

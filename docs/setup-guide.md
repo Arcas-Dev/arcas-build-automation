@@ -75,7 +75,7 @@ gcloud compute instances create ue5-build-server \
   --machine-type=n2-standard-16 \
   --image-family=windows-2022 \
   --image-project=windows-cloud \
-  --boot-disk-size=750GB \
+  --boot-disk-size=1000GB \
   --boot-disk-type=pd-ssd \
   --tags=allow-rdp,allow-ssh
 ```
@@ -85,7 +85,7 @@ gcloud compute instances create ue5-build-server \
 | Spec | Value | Why |
 |------|-------|-----|
 | Machine Type | n2-standard-16 | 16 vCPU, 64GB RAM - needed for UE5 compilation |
-| Disk | 750GB+ SSD | UE5 source (~200GB) + project + builds |
+| Disk | 1TB+ SSD | UE5 source (~200GB) + project + builds |
 | Disk Type | pd-ssd | Critical for build performance |
 | OS | Windows Server 2022 | Best UE5 compatibility |
 
@@ -444,14 +444,13 @@ If using Claude Code, you can trigger builds conversationally:
 
 Based on Arcas Champions (medium-sized UE5 project):
 
-| Phase | Duration |
-|-------|----------|
-| Compile (incremental) | 5-30 min |
-| Compile (full rebuild) | 30-45 min |
-| Cook | 60-90 min |
-| Stage + Pak + Archive | 10-15 min |
+| Build Type | Duration |
+|------------|----------|
+| **Incremental** (typical) | ~10 minutes |
+| Full rebuild | ~2-3 hours |
 | Steam Upload | 5-10 min |
-| **Total** | **~2-3 hours** |
+
+Note: Incremental builds (when only code/content changes) are much faster than full rebuilds.
 
 ---
 
@@ -478,7 +477,7 @@ ssh ... "C:\SteamCMD\steamcmd.exe +login your_account +quit"
 
 ### Out of disk space
 
-UE5 source + builds can exceed 500GB. Recommended: 750GB-1TB disk.
+UE5 source + builds can exceed 500GB. Recommended: 1TB+ disk.
 
 ```bash
 # Check disk space
@@ -493,9 +492,9 @@ ssh ... "powershell Get-PSDrive C"
 |----------|------|
 | n2-standard-16 VM (on-demand) | ~$0.76/hr |
 | n2-standard-16 VM (spot/preemptible) | ~$0.23/hr |
-| 750GB SSD | ~$127/month |
-| **Per 3-hour build (on-demand)** | **~$2.30** |
-| **Per 3-hour build (spot)** | **~$0.70** |
+| 1TB SSD | ~$170/month |
+| **Per incremental build (~10 min)** | **~$0.13** |
+| **Per full rebuild (~3 hours)** | **~$2.30** |
 
 **Tip:** Stop the VM when not building to save costs.
 

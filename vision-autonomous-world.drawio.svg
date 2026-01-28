@@ -1,130 +1,145 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1000px" height="600px" viewBox="-0.5 -0.5 1000 600" style="background-color: rgb(255, 255, 255);">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1000px" height="650px" viewBox="-0.5 -0.5 1000 650" style="background-color: rgb(255, 255, 255);">
   <defs/>
 
   <!-- Title -->
   <text x="500" y="35" font-family="Helvetica" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">Arcas Autonomous World - Vision</text>
-  <text x="500" y="58" font-family="Helvetica" font-size="14" text-anchor="middle" fill="#666">Player-Governed Game Development Pipeline</text>
+  <text x="500" y="58" font-family="Helvetica" font-size="14" text-anchor="middle" fill="#666">Player-Governed Game Development Cycle</text>
 
-  <!-- Row 1: Players & Voting -->
+  <!-- DEVELOPERS SECTION (Top Left) -->
+  <rect x="40" y="90" width="280" height="150" rx="5" ry="5" fill="#fff2cc" stroke="#d6b656" stroke-width="1" stroke-dasharray="4"/>
+  <text x="180" y="110" font-family="Helvetica" font-size="11" font-weight="bold" text-anchor="middle" fill="#d6b656">DEVELOPERS (Arcas Team)</text>
 
-  <!-- Players Box -->
-  <rect x="40" y="100" width="140" height="80" rx="10" ry="10" fill="#dae8fc" stroke="#6c8ebf" stroke-width="2"/>
-  <text x="110" y="135" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Players</text>
-  <text x="110" y="155" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Hold $ARCAS</text>
-  <text x="110" y="170" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Play &amp; Earn Rank</text>
+  <!-- Define Voting Structure -->
+  <rect x="55" y="125" width="115" height="50" rx="8" ry="8" fill="#fff2cc" stroke="#d6b656" stroke-width="2"/>
+  <text x="112" y="145" font-family="Helvetica" font-size="10" font-weight="bold" text-anchor="middle" fill="#333">Define Voting</text>
+  <text x="112" y="158" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">Structure</text>
 
-  <!-- Arrow 1 -->
-  <path d="M 180 140 L 225 140" fill="none" stroke="#333" stroke-width="2"/>
-  <path d="M 230 140 L 223 136 L 225 140 L 223 144 Z" fill="#333"/>
+  <!-- Define AI Ruleset -->
+  <rect x="185" y="125" width="115" height="50" rx="8" ry="8" fill="#fff2cc" stroke="#d6b656" stroke-width="2"/>
+  <text x="242" y="145" font-family="Helvetica" font-size="10" font-weight="bold" text-anchor="middle" fill="#333">Define AI</text>
+  <text x="242" y="158" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">Ruleset</text>
 
-  <!-- Voting Box -->
-  <rect x="235" y="100" width="140" height="80" rx="10" ry="10" fill="#e1d5e7" stroke="#9673a6" stroke-width="2"/>
-  <text x="305" y="130" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Governance</text>
-  <text x="305" y="150" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Vote on Changes</text>
-  <text x="305" y="165" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Buffs/Nerfs/Features</text>
+  <!-- Description under dev boxes -->
+  <text x="112" y="190" font-family="Helvetica" font-size="8" text-anchor="middle" fill="#666">What players can</text>
+  <text x="112" y="200" font-family="Helvetica" font-size="8" text-anchor="middle" fill="#666">vote on</text>
+  <text x="242" y="190" font-family="Helvetica" font-size="8" text-anchor="middle" fill="#666">What AI is allowed</text>
+  <text x="242" y="200" font-family="Helvetica" font-size="8" text-anchor="middle" fill="#666">to modify</text>
 
-  <!-- Arrow 2 -->
-  <path d="M 375 140 L 420 140" fill="none" stroke="#333" stroke-width="2"/>
-  <path d="M 425 140 L 418 136 L 420 140 L 418 144 Z" fill="#333"/>
+  <!-- Arrow from Devs to Governance -->
+  <path d="M 180 215 L 180 250" fill="none" stroke="#d6b656" stroke-width="2"/>
+  <path d="M 180 255 L 176 248 L 180 250 L 184 248 Z" fill="#d6b656"/>
 
-  <!-- Vote Passes Box -->
-  <rect x="430" y="100" width="140" height="80" rx="10" ry="10" fill="#d5e8d4" stroke="#82b366" stroke-width="2"/>
-  <text x="500" y="130" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Vote Passes</text>
-  <text x="500" y="150" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">On-Chain Record</text>
-  <text x="500" y="165" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Smart Contract</text>
+  <!-- MAIN CYCLE - Starting with Players -->
 
-  <!-- Row 2: AI & Code -->
+  <!-- Players Box (Left) -->
+  <rect x="60" y="280" width="140" height="90" rx="10" ry="10" fill="#dae8fc" stroke="#6c8ebf" stroke-width="2"/>
+  <text x="130" y="310" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Players</text>
+  <text x="130" y="330" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Play Ranked</text>
+  <text x="130" y="345" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Earn Rank (MMR)</text>
+  <text x="130" y="360" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Compete</text>
 
-  <!-- Arrow down from Vote -->
-  <path d="M 500 180 L 500 220" fill="none" stroke="#333" stroke-width="2"/>
-  <path d="M 500 225 L 496 218 L 500 220 L 504 218 Z" fill="#333"/>
+  <!-- Arrow from Players to Governance -->
+  <path d="M 200 325 L 245 325" fill="none" stroke="#333" stroke-width="2"/>
+  <path d="M 250 325 L 243 321 L 245 325 L 243 329 Z" fill="#333"/>
+
+  <!-- Governance/Voting Box -->
+  <rect x="255" y="260" width="160" height="130" rx="10" ry="10" fill="#e1d5e7" stroke="#9673a6" stroke-width="2"/>
+  <text x="335" y="290" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">In-Game Council</text>
+  <text x="335" y="310" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Vote on Changes</text>
+  <text x="335" y="328" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">• Weapon buffs/nerfs</text>
+  <text x="335" y="341" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">• New features</text>
+  <text x="335" y="354" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">• Game modes</text>
+  <text x="335" y="367" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666">• Balance changes</text>
+  <text x="335" y="383" font-family="Helvetica" font-size="10" font-style="italic" text-anchor="middle" fill="#9673a6">Rank = Voting Power</text>
+
+  <!-- Arrow from Governance to AI -->
+  <path d="M 415 325 L 460 325" fill="none" stroke="#333" stroke-width="2"/>
+  <path d="M 465 325 L 458 321 L 460 325 L 458 329 Z" fill="#333"/>
+  <text x="440" y="315" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#333">Vote</text>
+  <text x="440" y="326" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#333">Passes</text>
 
   <!-- AI Agent Box -->
-  <rect x="430" y="230" width="140" height="80" rx="10" ry="10" fill="#fff2cc" stroke="#d6b656" stroke-width="2"/>
-  <text x="500" y="260" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">AI Agent</text>
-  <text x="500" y="280" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Claude Code</text>
-  <text x="500" y="295" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Generates Changes</text>
+  <rect x="470" y="280" width="140" height="90" rx="10" ry="10" fill="#fff2cc" stroke="#d6b656" stroke-width="2"/>
+  <text x="540" y="310" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">AI Agent</text>
+  <text x="540" y="330" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Claude Code</text>
+  <text x="540" y="345" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Generates Changes</text>
+  <text x="540" y="360" font-family="Helvetica" font-size="10" font-style="italic" text-anchor="middle" fill="#d6b656">Within ruleset</text>
 
-  <!-- Arrow to Code -->
-  <path d="M 570 270 L 615 270" fill="none" stroke="#333" stroke-width="2"/>
-  <path d="M 620 270 L 613 266 L 615 270 L 613 274 Z" fill="#333"/>
+  <!-- Arrow from AI to Code -->
+  <path d="M 610 325 L 655 325" fill="none" stroke="#333" stroke-width="2"/>
+  <path d="M 660 325 L 653 321 L 655 325 L 653 329 Z" fill="#333"/>
 
   <!-- Code Changes Box -->
-  <rect x="625" y="230" width="140" height="80" rx="10" ry="10" fill="#f5f5f5" stroke="#666666" stroke-width="2"/>
-  <text x="695" y="260" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Code Changes</text>
-  <text x="695" y="280" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">UE5 C++/Blueprints</text>
-  <text x="695" y="295" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Push to Git</text>
+  <rect x="665" y="280" width="130" height="90" rx="10" ry="10" fill="#f5f5f5" stroke="#666666" stroke-width="2"/>
+  <text x="730" y="310" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Code Changes</text>
+  <text x="730" y="330" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">UE5 C++</text>
+  <text x="730" y="345" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Blueprints</text>
+  <text x="730" y="360" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Push to Git</text>
 
-  <!-- Row 3: Build & Deploy -->
+  <!-- Arrow from Code to Build -->
+  <path d="M 730 370 L 730 415" fill="none" stroke="#333" stroke-width="2"/>
+  <path d="M 730 420 L 726 413 L 730 415 L 734 413 Z" fill="#333"/>
 
-  <!-- Arrow down from Code -->
-  <path d="M 695 310 L 695 350" fill="none" stroke="#333" stroke-width="2"/>
-  <path d="M 695 355 L 691 348 L 695 350 L 699 348 Z" fill="#333"/>
+  <!-- Build Box -->
+  <rect x="665" y="425" width="130" height="80" rx="10" ry="10" fill="#ffe6cc" stroke="#d79b00" stroke-width="2"/>
+  <text x="730" y="455" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">GCP Build</text>
+  <text x="730" y="475" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">git pull + Build</text>
+  <text x="730" y="490" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">~10 minutes</text>
 
-  <!-- GCP Build Box -->
-  <rect x="625" y="360" width="140" height="80" rx="10" ry="10" fill="#ffe6cc" stroke="#d79b00" stroke-width="2"/>
-  <text x="695" y="390" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">GCP Build VM</text>
-  <text x="695" y="410" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">git pull + BuildCookRun</text>
-  <text x="695" y="425" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">~2-3 hours</text>
-
-  <!-- Arrow to Steam -->
-  <path d="M 765 400 L 810 400" fill="none" stroke="#333" stroke-width="2"/>
-  <path d="M 815 400 L 808 396 L 810 400 L 808 404 Z" fill="#333"/>
+  <!-- Arrow from Build to Steam -->
+  <path d="M 795 465 L 840 465" fill="none" stroke="#333" stroke-width="2"/>
+  <path d="M 845 465 L 838 461 L 840 465 L 838 469 Z" fill="#333"/>
 
   <!-- Steam Box -->
-  <rect x="820" y="360" width="140" height="80" rx="10" ry="10" fill="#dae8fc" stroke="#6c8ebf" stroke-width="2"/>
-  <text x="890" y="390" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Steam</text>
-  <text x="890" y="410" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Testing Branch</text>
-  <text x="890" y="425" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Auto-Deploy</text>
+  <rect x="850" y="425" width="120" height="80" rx="10" ry="10" fill="#dae8fc" stroke="#6c8ebf" stroke-width="2"/>
+  <text x="910" y="455" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Steam</text>
+  <text x="910" y="475" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Auto-Deploy</text>
+  <text x="910" y="490" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Testing Branch</text>
 
-  <!-- Row 4: Back to Players -->
-
-  <!-- Arrow down from Steam -->
-  <path d="M 890 440 L 890 480" fill="none" stroke="#333" stroke-width="2"/>
-  <path d="M 890 485 L 886 478 L 890 480 L 894 478 Z" fill="#333"/>
+  <!-- Arrow from Steam down -->
+  <path d="M 910 505 L 910 545" fill="none" stroke="#333" stroke-width="2"/>
+  <path d="M 910 550 L 906 543 L 910 545 L 914 543 Z" fill="#333"/>
 
   <!-- Updated Game Box -->
-  <rect x="820" y="490" width="140" height="70" rx="10" ry="10" fill="#d5e8d4" stroke="#82b366" stroke-width="2"/>
-  <text x="890" y="520" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Updated Game</text>
-  <text x="890" y="540" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Players Test Changes</text>
+  <rect x="850" y="555" width="120" height="60" rx="10" ry="10" fill="#d5e8d4" stroke="#82b366" stroke-width="2"/>
+  <text x="910" y="580" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Updated Game</text>
+  <text x="910" y="598" font-family="Helvetica" font-size="11" text-anchor="middle" fill="#666">Players Download</text>
 
-  <!-- Curved arrow back to Players -->
-  <path d="M 820 525 Q 500 580 110 180" fill="none" stroke="#82b366" stroke-width="2" stroke-dasharray="5,5"/>
-  <path d="M 110 175 L 106 184 L 110 180 L 114 184 Z" fill="#82b366"/>
+  <!-- Curved arrow back to Players (THE CYCLE) -->
+  <path d="M 850 585 Q 500 640 130 370" fill="none" stroke="#82b366" stroke-width="3"/>
+  <path d="M 130 365 L 126 374 L 130 370 L 134 374 Z" fill="#82b366"/>
 
-  <!-- Loop label -->
-  <text x="450" y="555" font-family="Helvetica" font-size="12" font-style="italic" text-anchor="middle" fill="#82b366">Feedback Loop - Players vote on next changes</text>
+  <!-- Cycle label -->
+  <text x="480" y="615" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#82b366">CYCLE REPEATS</text>
+  <text x="480" y="632" font-family="Helvetica" font-size="11" font-style="italic" text-anchor="middle" fill="#82b366">Players compete with changes → Vote on next iteration</text>
 
-  <!-- Side panel: Current Status -->
-  <rect x="40" y="230" width="160" height="210" rx="5" ry="5" fill="#f8f8f8" stroke="#ccc" stroke-width="1"/>
-  <text x="120" y="255" font-family="Helvetica" font-size="12" font-weight="bold" text-anchor="middle" fill="#333">Implementation Status</text>
+  <!-- Side panel: Implementation Status -->
+  <rect x="40" y="430" width="180" height="175" rx="5" ry="5" fill="#f8f8f8" stroke="#ccc" stroke-width="1"/>
+  <text x="130" y="455" font-family="Helvetica" font-size="12" font-weight="bold" text-anchor="middle" fill="#333">Implementation Status</text>
 
-  <text x="50" y="280" font-family="Helvetica" font-size="11" fill="#82b366">✓</text>
-  <text x="65" y="280" font-family="Helvetica" font-size="11" fill="#333">GCP Build VM</text>
+  <text x="50" y="480" font-family="Helvetica" font-size="11" fill="#82b366">✓</text>
+  <text x="65" y="480" font-family="Helvetica" font-size="11" fill="#333">GCP Build VM</text>
 
-  <text x="50" y="300" font-family="Helvetica" font-size="11" fill="#82b366">✓</text>
-  <text x="65" y="300" font-family="Helvetica" font-size="11" fill="#333">UE5 from Source</text>
+  <text x="50" y="500" font-family="Helvetica" font-size="11" fill="#82b366">✓</text>
+  <text x="65" y="500" font-family="Helvetica" font-size="11" fill="#333">UE5 from Source</text>
 
-  <text x="50" y="320" font-family="Helvetica" font-size="11" fill="#82b366">✓</text>
-  <text x="65" y="320" font-family="Helvetica" font-size="11" fill="#333">Git Pull Automation</text>
+  <text x="50" y="520" font-family="Helvetica" font-size="11" fill="#82b366">✓</text>
+  <text x="65" y="520" font-family="Helvetica" font-size="11" fill="#333">Git Pull Automation</text>
 
-  <text x="50" y="340" font-family="Helvetica" font-size="11" fill="#82b366">✓</text>
-  <text x="65" y="340" font-family="Helvetica" font-size="11" fill="#333">Steam Auto-Deploy</text>
+  <text x="50" y="540" font-family="Helvetica" font-size="11" fill="#82b366">✓</text>
+  <text x="65" y="540" font-family="Helvetica" font-size="11" fill="#333">Steam Auto-Deploy</text>
 
-  <text x="50" y="360" font-family="Helvetica" font-size="11" fill="#82b366">✓</text>
-  <text x="65" y="360" font-family="Helvetica" font-size="11" fill="#333">SSH Trigger</text>
+  <text x="50" y="560" font-family="Helvetica" font-size="11" fill="#82b366">✓</text>
+  <text x="65" y="560" font-family="Helvetica" font-size="11" fill="#333">SSH Trigger</text>
 
-  <line x1="50" y1="375" x2="190" y2="375" stroke="#ccc" stroke-width="1"/>
+  <line x1="50" y1="572" x2="210" y2="572" stroke="#ccc" stroke-width="1"/>
 
-  <text x="50" y="395" font-family="Helvetica" font-size="11" fill="#d79b00">○</text>
-  <text x="65" y="395" font-family="Helvetica" font-size="11" fill="#666">AI Code Generation</text>
+  <text x="50" y="590" font-family="Helvetica" font-size="11" fill="#d79b00">○</text>
+  <text x="65" y="590" font-family="Helvetica" font-size="11" fill="#666">In-Game Council UI</text>
 
-  <text x="50" y="415" font-family="Helvetica" font-size="11" fill="#d79b00">○</text>
-  <text x="65" y="415" font-family="Helvetica" font-size="11" fill="#666">Voting Smart Contract</text>
-
-  <text x="50" y="435" font-family="Helvetica" font-size="11" fill="#d79b00">○</text>
-  <text x="65" y="435" font-family="Helvetica" font-size="11" fill="#666">Edgegap Server Deploy</text>
+  <text x="50" y="605" font-family="Helvetica" font-size="11" fill="#d79b00">○</text>
+  <text x="65" y="605" font-family="Helvetica" font-size="11" fill="#666">AI Code Generation</text>
 
 </svg>

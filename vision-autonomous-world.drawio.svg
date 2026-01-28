@@ -18,11 +18,11 @@
   <text x="120" y="355" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333333">Players</text>
   <text x="120" y="373" font-family="Helvetica" font-size="10" text-anchor="middle" fill="#666666">Compete and Earn Rank</text>
 
-  <!-- AI Agent -->
-  <ellipse cx="560" cy="250" rx="85" ry="50" fill="#fff2cc" stroke="#d6b656" stroke-width="3"/>
-  <text x="560" y="240" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333333">AI Agent</text>
-  <text x="560" y="260" font-family="Helvetica" font-size="11" font-style="italic" text-anchor="middle" fill="#d6b656">Claudius Maximus</text>
-  <text x="560" y="278" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666666">(Claude Code)</text>
+  <!-- AI Agent - moved down and left -->
+  <ellipse cx="520" cy="290" rx="85" ry="50" fill="#fff2cc" stroke="#d6b656" stroke-width="3"/>
+  <text x="520" y="280" font-family="Helvetica" font-size="14" font-weight="bold" text-anchor="middle" fill="#333333">AI Agent</text>
+  <text x="520" y="300" font-family="Helvetica" font-size="11" font-style="italic" text-anchor="middle" fill="#d6b656">Claudius Maximus</text>
+  <text x="520" y="318" font-family="Helvetica" font-size="9" text-anchor="middle" fill="#666666">(Claude Code)</text>
 
   <!-- PROCESSES (Rectangles) -->
 
@@ -33,17 +33,17 @@
   <text x="335" y="388" font-family="Helvetica" font-size="10" font-style="italic" text-anchor="middle" fill="#9673a6">Rank = Voting Power</text>
 
   <!-- Git Codebase -->
-  <rect x="700" y="210" width="130" height="80" rx="8" ry="8" fill="#f5f5f5" stroke="#666666" stroke-width="2"/>
-  <text x="765" y="240" font-family="Helvetica" font-size="13" font-weight="bold" text-anchor="middle" fill="#333333">Git Codebase</text>
-  <text x="765" y="260" font-family="Helvetica" font-size="10" text-anchor="middle" fill="#666666">UE5 C++ / Blueprints</text>
-  <text x="765" y="278" font-family="Helvetica" font-size="10" text-anchor="middle" fill="#666666">Code Changes</text>
+  <rect x="700" y="150" width="130" height="80" rx="8" ry="8" fill="#f5f5f5" stroke="#666666" stroke-width="2"/>
+  <text x="765" y="180" font-family="Helvetica" font-size="13" font-weight="bold" text-anchor="middle" fill="#333333">Git Codebase</text>
+  <text x="765" y="200" font-family="Helvetica" font-size="10" text-anchor="middle" fill="#666666">UE5 C++ / Blueprints</text>
+  <text x="765" y="218" font-family="Helvetica" font-size="10" text-anchor="middle" fill="#666666">Code Changes</text>
 
   <!-- Automated Update -->
-  <rect x="680" y="380" width="170" height="90" rx="8" ry="8" fill="#ffe6cc" stroke="#d79b00" stroke-width="2"/>
-  <text x="765" y="405" font-family="Helvetica" font-size="13" font-weight="bold" text-anchor="middle" fill="#333333">Automated Update</text>
-  <text x="765" y="425" font-family="Helvetica" font-size="10" text-anchor="middle" fill="#666666">git pull</text>
-  <text x="765" y="442" font-family="Helvetica" font-size="10" text-anchor="middle" fill="#666666">Build on GCP VM</text>
-  <text x="765" y="459" font-family="Helvetica" font-size="10" text-anchor="middle" fill="#666666">Deploy on Steam</text>
+  <rect x="680" y="320" width="170" height="90" rx="8" ry="8" fill="#ffe6cc" stroke="#d79b00" stroke-width="2"/>
+  <text x="765" y="345" font-family="Helvetica" font-size="13" font-weight="bold" text-anchor="middle" fill="#333333">Automated Update</text>
+  <text x="765" y="365" font-family="Helvetica" font-size="10" text-anchor="middle" fill="#666666">git pull</text>
+  <text x="765" y="382" font-family="Helvetica" font-size="10" text-anchor="middle" fill="#666666">Build on GCP VM</text>
+  <text x="765" y="399" font-family="Helvetica" font-size="10" text-anchor="middle" fill="#666666">Deploy on Steam</text>
 
   <!-- Updated Game -->
   <rect x="430" y="480" width="130" height="55" rx="8" ry="8" fill="#d5e8d4" stroke="#82b366" stroke-width="2"/>
@@ -54,38 +54,38 @@
 
   <!-- Developer to In-Game Council (Define Voting) -->
   <line x1="170" y1="175" x2="270" y2="320" stroke="#d6b656" stroke-width="2"/>
-  <polygon points="270,320 262,315 265,322" fill="#d6b656"/>
+  <polygon points="275,325 265,318 270,327" fill="#d6b656"/>
   <text x="175" y="230" font-family="Helvetica" font-size="10" fill="#d6b656">Define Voting</text>
 
   <!-- Developer to Git Codebase (Define AI Ruleset) -->
-  <line x1="195" y1="130" x2="695" y2="220" stroke="#d6b656" stroke-width="2"/>
-  <polygon points="700,221 691,217 692,225" fill="#d6b656"/>
-  <text x="420" y="145" font-family="Helvetica" font-size="10" fill="#d6b656">Define AI Code Change Ruleset</text>
+  <line x1="195" y1="130" x2="695" y2="175" stroke="#d6b656" stroke-width="2"/>
+  <polygon points="700,176 690,172 691,180" fill="#d6b656"/>
+  <text x="420" y="125" font-family="Helvetica" font-size="10" fill="#d6b656">Define AI Code Change Ruleset</text>
 
   <!-- Players to In-Game Council -->
   <line x1="195" y1="360" x2="255" y2="360" stroke="#333333" stroke-width="2"/>
   <polygon points="260,360 252,356 252,364" fill="#333333"/>
 
   <!-- In-Game Council to AI Agent (Vote Passes) -->
-  <line x1="410" y1="340" x2="480" y2="280" stroke="#333333" stroke-width="2"/>
-  <polygon points="485,276 475,277 479,284" fill="#333333"/>
-  <text x="470" y="325" font-family="Helvetica" font-size="10" fill="#333333">Vote Passes</text>
+  <line x1="410" y1="350" x2="430" y2="310" stroke="#333333" stroke-width="2"/>
+  <polygon points="433,305 425,312 433,315" fill="#333333"/>
+  <text x="445" y="345" font-family="Helvetica" font-size="10" fill="#333333">Vote Passes</text>
 
   <!-- AI Agent to Git Codebase -->
-  <line x1="645" y1="250" x2="695" y2="250" stroke="#333333" stroke-width="2"/>
-  <polygon points="700,250 692,246 692,254" fill="#333333"/>
+  <line x1="605" y1="280" x2="695" y2="210" stroke="#333333" stroke-width="2"/>
+  <polygon points="700,206 690,210 694,218" fill="#333333"/>
 
   <!-- Git Codebase to Automated Update -->
-  <line x1="765" y1="290" x2="765" y2="375" stroke="#333333" stroke-width="2"/>
-  <polygon points="765,380 761,372 769,372" fill="#333333"/>
+  <line x1="765" y1="230" x2="765" y2="315" stroke="#333333" stroke-width="2"/>
+  <polygon points="765,320 761,312 769,312" fill="#333333"/>
 
   <!-- Automated Update to Updated Game -->
-  <line x1="680" y1="450" x2="565" y2="495" stroke="#333333" stroke-width="2"/>
-  <polygon points="560,497 570,494 567,502" fill="#333333"/>
+  <line x1="680" y1="390" x2="565" y2="485" stroke="#333333" stroke-width="2"/>
+  <polygon points="560,490 568,482 572,490" fill="#333333"/>
 
   <!-- Updated Game back to Players (Cycle) -->
   <path d="M 430 507 Q 280 520 145 405" fill="none" stroke="#82b366" stroke-width="3"/>
-  <polygon points="143,400 140,410 148,407" fill="#82b366"/>
+  <polygon points="140,400 142,412 150,405" fill="#82b366"/>
   <text x="260" y="535" font-family="Helvetica" font-size="10" font-style="italic" fill="#82b366">Players compete with new changes</text>
 
 </svg>

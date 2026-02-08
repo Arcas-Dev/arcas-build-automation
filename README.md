@@ -1,8 +1,8 @@
-# Arcas Build Automation
+# Arcas Build Automation & Codebase Knowledge
 
-Automated UE5 build and Steam deployment pipeline for Arcas Champions.
+Automated UE5 build pipeline, Steam deployment, and accumulated codebase knowledge for Arcas Champions development.
 
-**Stack:** GCP Windows VM + UE5.5 (source) + SteamCMD + SSH
+**Stack:** GCP Windows VM (GPU) + UE5.5 (source) + SteamCMD + SSH
 
 ```
 ┌─────────────┐      SSH       ┌─────────────────┐                ┌─────────────┐
@@ -38,7 +38,7 @@ feature/* ──▶ deploy/steam-testing ──▶ (automated build) ──▶ m
 
 ## Status: Fully Working ✅
 
-**Last tested:** 2026-01-28
+**Last tested:** 2026-02-08
 - Git pull from `deploy/steam-testing` ✅
 - Full BuildCookRun ✅
 - Steam upload to Demo testing branch ✅
@@ -52,14 +52,14 @@ feature/* ──▶ deploy/steam-testing ──▶ (automated build) ──▶ m
 ### Start a Build
 
 ```bash
-ssh -i ~/.ssh/arcas_build_key daniel@34.158.27.129 \
+ssh -i ~/.ssh/arcas_build_key daniel@34.65.146.42 \
   "powershell -Command \"Invoke-WmiMethod -Class Win32_Process -Name Create -ArgumentList 'cmd /c C:\\A\\Scripts\\build.bat'\""
 ```
 
 ### Check Status
 
 ```bash
-ssh -i ~/.ssh/arcas_build_key daniel@34.158.27.129 "type C:\\A\\status.txt"
+ssh -i ~/.ssh/arcas_build_key daniel@34.65.146.42 "type C:\\A\\status.txt"
 ```
 
 **Status values:** `IDLE` | `PULLING` | `BUILDING` | `UPLOADING` | `COMPLETE` | `PULL_FAILED` | `BUILD_FAILED` | `UPLOAD_FAILED`
@@ -68,11 +68,11 @@ ssh -i ~/.ssh/arcas_build_key daniel@34.158.27.129 "type C:\\A\\status.txt"
 
 ```bash
 # View recent log output
-ssh -i ~/.ssh/arcas_build_key daniel@34.158.27.129 \
+ssh -i ~/.ssh/arcas_build_key daniel@34.65.146.42 \
   "powershell -Command \"Get-Content 'C:\\UE5.5\\Engine\\Programs\\AutomationTool\\Saved\\Logs\\Log.txt' -Tail 30\""
 
 # Check if build is running
-ssh -i ~/.ssh/arcas_build_key daniel@34.158.27.129 "tasklist | findstr /i dotnet"
+ssh -i ~/.ssh/arcas_build_key daniel@34.65.146.42 "tasklist | findstr /i dotnet"
 ```
 
 ---
@@ -83,12 +83,13 @@ ssh -i ~/.ssh/arcas_build_key daniel@34.158.27.129 "tasklist | findstr /i dotnet
 
 | Property | Value |
 |----------|-------|
-| **VM Name** | arcas-build-server |
+| **VM Name** | arcas-build-server-gpu |
 | **GCP Project** | arcas-champions |
-| **Zone** | europe-west6-a |
-| **External IP** | 34.158.27.129 |
-| **Machine Type** | n2-standard-16 (64GB RAM) |
+| **Zone** | europe-west6-b |
+| **External IP** | 34.65.146.42 |
+| **Machine Type** | g2-standard-8 (8 vCPU, 32GB RAM, NVIDIA L4 24GB GPU) |
 | **Disk** | 1TB SSD |
+| **Capabilities** | Headless builds + UE5 Editor via RDP (GPU rendering) |
 | **SSH User** | daniel |
 | **SSH Key** | ~/.ssh/arcas_build_key |
 
@@ -160,14 +161,19 @@ C:\
 
 ```
 arcas-build-automation/
-├── README.md                       # This file
-├── vision-autonomous-world.drawio.svg  # Big picture - player governance vision
+├── README.md                            # This file
+├── vision-autonomous-world.drawio.svg   # Big picture - player governance vision
 ├── scripts/
-│   ├── build-and-deploy.ps1        # Main PowerShell script (runs on VM)
-│   └── build.bat                   # Batch wrapper
-└── docs/
-    ├── setup-guide.md              # Full setup guide (GCP, UE5, Steam)
-    └── build-pipeline.drawio.svg   # Current pipeline diagram
+│   ├── build-and-deploy.ps1             # Main PowerShell script (runs on VM)
+│   └── build.bat                        # Batch wrapper
+├── docs/
+│   ├── setup-guide.md                   # Full setup guide (GCP, UE5, Steam)
+│   └── build-pipeline.drawio.svg        # Current pipeline diagram
+├── codebase/                            # Accumulated codebase knowledge
+│   ├── general-workflow.md              # Dev cycle: SSH → C++ → Editor → Build → Steam
+│   ├── totem-abilities.md               # Totem ability system architecture & Rage deep dive
+│   └── totem-ui-active-effect.md        # Recipe: adding UI widgets to totem abilities
+└── productization/                      # Cost models and Steam credentials research
 ```
 
 ## Diagrams
@@ -181,6 +187,20 @@ The full vision: Developers define rules → Players compete & vote in-game → 
 ![Pipeline Diagram](docs/build-pipeline.drawio.svg)
 
 What's working now: SSH trigger → Git pull → BuildCookRun → Steam upload
+
+---
+
+## Codebase Knowledge
+
+The `codebase/` folder contains accumulated knowledge about the ApeShooter/Arcas Champions codebase. These docs are built up over time as we work on the game - they capture architecture, patterns, and step-by-step recipes for common tasks.
+
+| Doc | What It Covers |
+|-----|---------------|
+| [general-workflow.md](codebase/general-workflow.md) | Full dev cycle: SSH access, SCP file strategy, compilation, build triggers, git workflow, key paths |
+| [totem-abilities.md](codebase/totem-abilities.md) | Totem ability system class hierarchy, Rage ability deep dive, lifecycle, async loading, prediction |
+| [totem-ui-active-effect.md](codebase/totem-ui-active-effect.md) | Recipe for connecting UI widgets to ability state (C++ + Blueprint patterns, positioning, troubleshooting) |
+
+**Adding new knowledge:** When working on a new system (weapons, characters, networking, etc.), add a new `.md` to `codebase/` documenting what was learned - architecture, file locations, patterns, gotchas.
 
 ---
 
@@ -273,8 +293,8 @@ UE5 source needs ~200GB, builds need ~10-50GB each. Use 750GB+ disk.
 
 | Resource | Cost |
 |----------|------|
-| VM (on-demand) | ~$0.76/hr |
-| VM (spot) | ~$0.23/hr |
+| VM (on-demand, g2-standard-8 + L4 GPU) | ~$1.00/hr |
+| VM (spot, if available) | ~$0.30/hr |
 | 1TB SSD | ~$170/month |
 | **Per incremental build** | **~$0.13** (10 min) |
 | **Per full rebuild** | **~$2.30** (3 hours) |

@@ -8,9 +8,16 @@ The game runs on UE5.5 (built from source) on a GCP Windows VM. Code changes are
 
 | Method | Command |
 |--------|---------|
-| **SSH** | `ssh -i ~/.ssh/arcas_build_key daniel@34.65.146.42` |
-| **SCP** | `scp -i ~/.ssh/arcas_build_key <local> daniel@34.65.146.42:"C:/A/staging/"` |
-| **RDP** | Windows Remote Desktop to `34.65.146.42` (user: `daniel`) |
+| **SSH** | `ssh -i ~/.ssh/arcas_build_key daniel@<IP>` |
+| **SCP** | `scp -i ~/.ssh/arcas_build_key <local> daniel@<IP>:"C:/A/staging/"` |
+| **RDP** | Windows Remote Desktop to `<IP>` (user: `daniel`) |
+
+**VM IP is ephemeral** — changes on every stop/start. Get current IP:
+```bash
+gcloud compute instances list --project=arcas-champions --format="value(networkInterfaces[0].accessConfigs[0].natIP)"
+```
+
+Also tracked locally in `vm-status.txt`.
 
 **Staging area**: `C:\A\staging\` - drop zone for files before deploying to project.
 
@@ -62,9 +69,15 @@ The game runs on UE5.5 (built from source) on a GCP Windows VM. Code changes are
 ┌──────────────────────────────▼──────────────────────────────────┐
 │  5. BUILD + DEPLOY (Automated)                                  │
 │                                                                  │
-│  - Trigger: SSH execute build.bat                               │
-│  - Script: git pull → BuildCookRun (~10-15 min) → Steam upload  │
-│  - Output: Live on Steam Demo (3487030) testing branch          │
+│  Option A: Client only (build.bat)                              │
+│  - git pull → Win64 BuildCookRun (~10 min) → Steam upload       │
+│                                                                  │
+│  Option B: Full pipeline (build-all.bat) — RECOMMENDED          │
+│  - git pull → Linux server build → Cloud Build + Win64 (parallel)│
+│  - → PATCH Edgegap + Steam upload (parallel)                    │
+│  - See pipeline-planning.md for full diagram                     │
+│                                                                  │
+│  - Output: Client on Steam Demo, Server on Edgegap              │
 └──────────────────────────────┬──────────────────────────────────┘
                                │
 ┌──────────────────────────────▼──────────────────────────────────┐
@@ -200,12 +213,20 @@ ssh -i ~/.ssh/arcas_build_key daniel@34.65.146.42 \
   "tasklist | findstr -i \"Unreal dotnet ShaderCompile UnrealPak\""
 ```
 
-### Build Pipeline (build.bat)
+### Build Pipelines
 
+**Client only** (`build.bat`):
 1. `git pull origin deploy/steam-testing`
-2. `BuildCookRun` (~10-15 min) → outputs to `C:\A\Builds\ArcasChampionsSteam\Windows`
+2. Win64 `BuildCookRun` (~10 min) → `C:\A\Builds\ArcasChampionsSteam\Windows`
 3. `SteamCMD` upload to Demo app (3487030) `testing` branch
 4. Writes status to `C:\A\status.txt`
+
+**Full pipeline** (`build-all.bat`) — builds client + server:
+1. `git pull origin deploy/steam-testing`
+2. Linux server `BuildCookRun` (~10 min incr / ~45 min full)
+3. Cloud Build submit (background, ~8 min) + Win64 build (parallel, ~10 min)
+4. PATCH Edgegap docker_tag + Steam upload (parallel, ~2 min)
+5. See `pipeline-planning.md` for detailed diagram and timing
 
 ### Steam Reference
 
@@ -248,10 +269,12 @@ git add path/to/file.h path/to/file.cpp path/to/Asset.uasset
 | `C:\UE5.5` | UE5.5 built from source |
 | `C:\A\ApeShooter\NewApeShooter` | Game project root |
 | `C:\A\Builds\ArcasChampionsSteam\Windows` | Build output |
-| `C:\A\Scripts\build.bat` | Build + Deploy script |
+| `C:\A\Scripts\build.bat` | Client-only build + Steam deploy |
+| `C:\A\Scripts\build-all.bat` | Full pipeline (client + server + Edgegap) |
 | `C:\A\status.txt` | Build status file |
 | `C:\A\Logs\` | Build and compile logs |
 | `C:\A\staging\` | File deployment staging area |
+| `C:\A\Builds\LinuxServer\` | Linux server build output (1.53 GB) |
 
 ### Source Code Paths (relative to project root)
 
@@ -275,6 +298,24 @@ git add path/to/file.h path/to/file.cpp path/to/Asset.uasset
 | `Plugins/.../Content/GameplayAbilities/` | GA_Rage and other ability Blueprints |
 | `Plugins/.../Content/GameplayEffects/` | GE_Rage, GE_Rage_Explosion, etc. |
 | `Plugins/.../Content/Totems/` | Totem item definitions (ID_Rage, etc.) |
+
+### Config Files
+
+| Path | Purpose | Notes |
+|------|---------|-------|
+| `Config/DefaultBeviumTools.ini` | Matchmaker QueryValueKey, runtime settings | Standard UE5 config, packaged by BuildCookRun |
+| `Config/DefaultGame.ini` | Game settings | |
+| `Config/DefaultEngine.ini` | Engine settings | |
+| `Config/Custom/Server/DefaultEngine.ini` | Server build settings | Contains `SecretTokenPath` for auth token |
+| `Secrets/SecretToken.txt` | Server API auth token | Baked at compile time by `ArcasChampionsServer.Target.cs` |
+
+**DefaultBeviumTools.ini** contains the matchmaker routing keys:
+```ini
+[/Script/BeviumTools.BeviumToolsRuntimeSettings]
+AdditionalParameters=(("QueryValueKey", "casual"),("QueryValueKey_Ranked", "ranked"))
+```
+
+This is a `UDeveloperSettings` config read at runtime — any BuildCookRun packages it correctly.
 
 ---
 

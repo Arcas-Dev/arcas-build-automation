@@ -1,0 +1,120 @@
+{
+	"max_deployment_retry_count": 3,
+	"profiles": {
+		"casual": {
+			"application": {
+				"name": "arcas-champions",
+				"version": "testing-server"
+			},
+			"rules": {
+				"initial": {
+					"match_size": {
+						"type": "player_count",
+						"attributes": {
+							"team_count": 2,
+							"team_size": 8
+						}
+					},
+					"beacons": {
+						"type": "latencies",
+						"attributes": {
+							"difference": 500,
+							"max_latency": 1000
+						}
+					},
+					"selected_game_mode": {
+						"type": "string_equality"
+					},
+					"selected_map": {
+						"type": "intersection",
+						"attributes": {
+							"overlap": 1
+						}
+					}
+				},
+				"expansions": {
+					"10": {
+						"match_size": {
+							"team_count": 2,
+							"team_size": 4
+						}
+					},
+					"20": {
+						"match_size": {
+							"team_count": 2,
+							"team_size": 2
+						}
+					},
+					"30": {
+						"match_size": {
+							"team_count": 2,
+							"team_size": 1
+						}
+					},
+					"45": {
+						"match_size": {
+							"team_count": 1,
+							"team_size": 1
+						}
+					}
+				}
+			}
+		},
+		"ranked": {
+			"application": {
+				"name": "arcas-champions",
+				"version": "testing-server"
+			},
+			"rules": {
+				"initial": {
+					"match_size": {
+						"type": "player_count",
+						"attributes": {
+							"team_count": 2,
+							"team_size": 4
+						}
+					},
+					"beacons": {
+						"type": "latencies",
+						"attributes": {
+							"difference": 500,
+							"max_latency": 1000
+						}
+					},
+					"selected_game_mode": {
+						"type": "string_equality"
+					},
+					"selected_map": {
+						"type": "intersection",
+						"attributes": {
+							"overlap": 1
+						}
+					}
+				},
+				"expansions": {
+					"20": {
+						"match_size": {
+							"team_count": 2,
+							"team_size": 2
+						}
+					},
+					"30": {
+						"match_size": {
+							"team_count": 2,
+							"team_size": 1
+						}
+					},
+					"45": {
+						"match_size": {
+							"team_count": 1,
+							"team_size": 1
+						}
+					}
+				}
+			}
+		}
+	},
+	"version": "1.0.0",
+	"ticket_expiration_period": "5m",
+	"ticket_removal_period": "2m"
+}

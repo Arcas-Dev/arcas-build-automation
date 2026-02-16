@@ -1,0 +1,33 @@
+steps:
+  # All-in-one: auth, build, and push
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        set -e
+
+        # Docker login using secret credentials
+        echo "$$EDGEGAP_AUTH" | base64 -d > /tmp/creds.txt
+        DOCKER_USER=$$(cut -d: -f1 /tmp/creds.txt)
+        DOCKER_PASS=$$(cut -d: -f2 /tmp/creds.txt)
+        echo "$$DOCKER_PASS" | docker login registry.edgegap.com -u "$$DOCKER_USER" --password-stdin
+        rm /tmp/creds.txt
+
+        # Build the image
+        echo "=== Building image with tag: ${_TAG} ==="
+        docker build -t registry.edgegap.com/arcas-champions-n3tkvcfhbvhf/arcastest6:${_TAG} .
+
+        # Push to Edgegap registry
+        echo "=== Pushing to Edgegap registry ==="
+        docker push registry.edgegap.com/arcas-champions-n3tkvcfhbvhf/arcastest6:${_TAG}
+        echo "=== Push complete ==="
+    secretEnv: ['EDGEGAP_AUTH']
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/arcas-champions/secrets/edgegap-registry-token/versions/latest
+      env: 'EDGEGAP_AUTH'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

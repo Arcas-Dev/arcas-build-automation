@@ -15,7 +15,8 @@ UTotemGameplayAbility (C++)
 USideBarAbilityWidget : UUserWidget (C++)
   ├── Properties exposed to Blueprint (BlueprintReadOnly)
   ├── Setter methods (BlueprintCallable)
-  └── BlueprintImplementableEvents for Blueprint to react
+  ├── BeginFadeOut() — self-managed fade + RemoveFromParent
+  └── BlueprintImplementableEvents (OnProgressChanged, OnFadeOut, etc.)
 
 W_SideBarRage : USideBarAbilityWidget (Blueprint)
   ├── Visual layout (images, materials, animations)
@@ -144,7 +145,7 @@ void UYourAbility::DestroyWidget()
     }
     if (Widget)
     {
-        Widget->RemoveFromParent();
+        Widget->BeginFadeOut(0.5f);  // Widget manages its own fade + removal
         Widget = nullptr;
     }
 }
@@ -191,13 +192,107 @@ void UYourAbility::OnDeployedGameplayEventReceived(...)
 
 void UYourAbility::EndAbility(...)
 {
-    DestroyWidget();  // Remove widget FIRST
+    DestroyWidget();  // Triggers fade-out; widget self-removes when opacity hits 0
     // ... existing cleanup code ...
-    Super::EndAbility(...);
+    Super::EndAbility(...);  // After this, ability timers are killed — widget's timer survives
 }
 ```
 
-### 4. Compile and Deploy to VM
+### 4. Polish: Fade In + Fade Out
+
+After `AddToViewport()`, the material defaults its fill parameter to 1.0 (full bar). To fix:
+
+```cpp
+Widget->AddToViewport(10);
+Widget->SetProgress(0.0f);       // Start empty (material defaults to full)
+Widget->SetRenderOpacity(0.0f);  // Start invisible for fade-in
+
+// Fade in over 0.5s
+FadeInElapsed = 0.0f;
+GetWorld()->GetTimerManager().SetTimer(FadeInTimerHandle, this,
+    &ThisClass::FadeInWidget, 0.016f, true);
+```
+
+```cpp
+void UYourAbility::FadeInWidget()
+{
+    if (!Widget)
+    {
+        GetWorld()->GetTimerManager().ClearTimer(FadeInTimerHandle);
+        return;
+    }
+    FadeInElapsed += 0.016f;
+    const float Alpha = FMath::Clamp(FadeInElapsed / 0.5f, 0.0f, 1.0f);
+    Widget->SetRenderOpacity(Alpha);
+    if (Alpha >= 1.0f)
+        GetWorld()->GetTimerManager().ClearTimer(FadeInTimerHandle);
+}
+```
+
+Don't forget to clear `FadeInTimerHandle` in `DestroyWidget()`.
+
+#### Fade-Out: Widget Must Own Its Own Lifecycle
+
+**CRITICAL**: Do NOT run fade-out timers on the ability object. After `Super::EndAbility()`, GAS cleans up the ability instance and the timer manager auto-removes any timers owned by it. The widget stays in the viewport at whatever opacity it had — frozen forever.
+
+**Correct pattern**: The widget manages its own fade-out via `BeginFadeOut()`. The widget is rooted by the viewport (`AddToViewport` keeps it alive), so its timers survive independently of the ability.
+
+```cpp
+// In USideBarAbilityWidget (the widget base class):
+void USideBarAbilityWidget::BeginFadeOut(float Duration)
+{
+    FadeOutDuration = Duration;
+    FadeOutElapsed = 0.0f;
+    if (UWorld* World = GetWorld())
+    {
+        World->GetTimerManager().SetTimer(FadeOutTimerHandle, this,
+            &ThisClass::TickFadeOut, 0.016f, true);
+    }
+}
+
+void USideBarAbilityWidget::TickFadeOut()
+{
+    FadeOutElapsed += 0.016f;
+    const float Alpha = FMath::Clamp(1.0f - (FadeOutElapsed / FadeOutDuration), 0.0f, 1.0f);
+    SetRenderOpacity(Alpha);
+    OnFadeOut(Alpha);  // BlueprintImplementableEvent — BP can also set material opacity
+    if (Alpha <= 0.0f)
+    {
+        if (UWorld* World = GetWorld())
+            World->GetTimerManager().ClearTimer(FadeOutTimerHandle);
+        RemoveFromParent();  // Self-destruct
+    }
+}
+```
+
+```cpp
+// In the ability's DestroyWidget():
+void UYourAbility::DestroyWidget()
+{
+    if (GetWorld())
+    {
+        GetWorld()->GetTimerManager().ClearTimer(UIUpdateTimerHandle);
+        GetWorld()->GetTimerManager().ClearTimer(FadeInTimerHandle);
+    }
+    if (Widget)
+    {
+        Widget->BeginFadeOut(0.5f);  // Widget handles its own removal
+        Widget = nullptr;            // Release ability's reference
+    }
+}
+```
+
+#### Material Opacity During Fade-Out
+
+`SetRenderOpacity()` affects standard UMG elements (Image, Text) but materials render their own opacity independently. To fade material-driven elements uniformly:
+
+1. Override `OnFadeOut(Alpha)` in the widget Blueprint
+2. Use `Get Dynamic Material` on the material Image
+3. Set the material's `Opacity` parameter to match `Alpha`
+
+Without this, the icon/decorative elements fade while the material bar stays opaque.
+
+### 5. Compile and Deploy to VM
 
 See `general-workflow.md` for the full SCP + compile process.
 
@@ -334,6 +429,7 @@ Common HUD material parameters:
 ### Widget stays after ability ends
 - Ensure `DestroyWidget()` is called at the top of `EndAbility()`
 - Check that `EndAbility` is actually being reached (add log if needed)
+- **If using fade-out**: the fade timer MUST be owned by the widget, NOT the ability. After `Super::EndAbility()`, timers on the ability object are killed by GAS cleanup. See "Fade-Out: Widget Must Own Its Own Lifecycle" above.
 
 ### Widget appears for other players
 - The `IsOwnerLocallyControlled()` guard must be in `CreateWidget()`

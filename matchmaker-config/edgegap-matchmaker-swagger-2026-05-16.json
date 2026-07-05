@@ -1,0 +1,2212 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Matchmaker",
+    "version": ""
+  },
+  "servers": [
+    {
+      "url": "https://om-pjotlrwfa6.edgegap.net"
+    }
+  ],
+  "paths": {
+    "/backfills": {
+      "post": {
+        "tags": [
+          "Backfill"
+        ],
+        "summary": "Create a backfill ticket",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBackfillRequest"
+              },
+              "examples": {
+                "BackfillRequest (casual)": {
+                  "summary": "casual Example",
+                  "description": "Example request body for the casual profile.",
+                  "value": {
+                    "profile": "casual",
+                    "attributes": {
+                      "deployment_request_id": "3c9abdc2fdb8"
+                    },
+                    "tickets": {
+                      "some_player_id_1": {
+                        "player_ip": "174.25.48.238",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      },
+                      "some_player_id_2": {
+                        "player_ip": "217.34.85.142",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      },
+                      "some_player_id_3": {
+                        "player_ip": "136.224.30.243",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      }
+                    }
+                  }
+                },
+                "BackfillRequest (ranked)": {
+                  "summary": "ranked Example",
+                  "description": "Example request body for the ranked profile.",
+                  "value": {
+                    "profile": "ranked",
+                    "attributes": {
+                      "deployment_request_id": "3c9abdc2fdb8"
+                    },
+                    "tickets": {
+                      "some_player_id_1": {
+                        "player_ip": "174.25.48.238",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      },
+                      "some_player_id_2": {
+                        "player_ip": "217.34.85.142",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      },
+                      "some_player_id_3": {
+                        "player_ip": "136.224.30.243",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBackfillRequest"
+              },
+              "examples": {
+                "BackfillRequest (casual)": {
+                  "summary": "casual Example",
+                  "description": "Example request body for the casual profile.",
+                  "value": {
+                    "profile": "casual",
+                    "attributes": {
+                      "deployment_request_id": "3c9abdc2fdb8"
+                    },
+                    "tickets": {
+                      "some_player_id_1": {
+                        "player_ip": "174.25.48.238",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      },
+                      "some_player_id_2": {
+                        "player_ip": "217.34.85.142",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      },
+                      "some_player_id_3": {
+                        "player_ip": "136.224.30.243",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      }
+                    }
+                  }
+                },
+                "BackfillRequest (ranked)": {
+                  "summary": "ranked Example",
+                  "description": "Example request body for the ranked profile.",
+                  "value": {
+                    "profile": "ranked",
+                    "attributes": {
+                      "deployment_request_id": "3c9abdc2fdb8"
+                    },
+                    "tickets": {
+                      "some_player_id_1": {
+                        "player_ip": "174.25.48.238",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      },
+                      "some_player_id_2": {
+                        "player_ip": "217.34.85.142",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      },
+                      "some_player_id_3": {
+                        "player_ip": "136.224.30.243",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBackfillRequest"
+              },
+              "examples": {
+                "BackfillRequest (casual)": {
+                  "summary": "casual Example",
+                  "description": "Example request body for the casual profile.",
+                  "value": {
+                    "profile": "casual",
+                    "attributes": {
+                      "deployment_request_id": "3c9abdc2fdb8"
+                    },
+                    "tickets": {
+                      "some_player_id_1": {
+                        "player_ip": "174.25.48.238",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      },
+                      "some_player_id_2": {
+                        "player_ip": "217.34.85.142",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      },
+                      "some_player_id_3": {
+                        "player_ip": "136.224.30.243",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      }
+                    }
+                  }
+                },
+                "BackfillRequest (ranked)": {
+                  "summary": "ranked Example",
+                  "description": "Example request body for the ranked profile.",
+                  "value": {
+                    "profile": "ranked",
+                    "attributes": {
+                      "deployment_request_id": "3c9abdc2fdb8"
+                    },
+                    "tickets": {
+                      "some_player_id_1": {
+                        "player_ip": "174.25.48.238",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      },
+                      "some_player_id_2": {
+                        "player_ip": "217.34.85.142",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      },
+                      "some_player_id_3": {
+                        "player_ip": "136.224.30.243",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        },
+                        "group_id": "group1",
+                        "id": "player1",
+                        "created_at": "2021-09-01T12:00:00Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadBackfillResponse"
+                },
+                "example": {"id":"cqg0bg550h7uujd77khg","profile":"Quickplay","tickets":{"ticket1":{"id":"ticket1","created_at":"2026-05-16T13:45:38.5281672Z","player_ip":"1.1.1.1","group_id":"group1","attributes":{}}},"status":"SEARCHING","assigned_ticket":{"id":"ticket2","created_at":"2026-05-16T13:45:38.5288267Z","player_ip":"1.1.1.1","group_id":"group1","attributes":{}}}
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/backfills/{backfillId}": {
+      "get": {
+        "tags": [
+          "Backfill"
+        ],
+        "summary": "Read a backfill ticket's information",
+        "parameters": [
+          {
+            "name": "backfillId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadBackfillResponse"
+                },
+                "example": {"id":"cqg0bg550h7uujd77khg","profile":"Quickplay","tickets":{"ticket1":{"id":"ticket1","created_at":"2026-05-16T13:45:38.578238Z","player_ip":"1.1.1.1","group_id":"group1","attributes":{}}},"status":"SEARCHING","assigned_ticket":{"id":"ticket2","created_at":"2026-05-16T13:45:38.5782392Z","player_ip":"1.1.1.1","group_id":"group1","attributes":{}}}
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                },
+                "example": {"message":"404 Not Found"}
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Backfill"
+        ],
+        "summary": "Delete a backfill ticket",
+        "parameters": [
+          {
+            "name": "backfillId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                },
+                "example": {"message":"404 Not Found"}
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/group-tickets": {
+      "post": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "Create Group tickets Request.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGroupRequest"
+              },
+              "examples": {
+                "GroupRequest (casual)": {
+                  "summary": "casual Example",
+                  "description": "Example request body for the casual profile.",
+                  "value": {
+                    "player_tickets": [
+                      {
+                        "player_ip": "174.25.48.238",
+                        "profile": "casual",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      },
+                      {
+                        "player_ip": "217.34.85.142",
+                        "profile": "casual",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      },
+                      {
+                        "player_ip": "136.224.30.243",
+                        "profile": "casual",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                "GroupRequest (ranked)": {
+                  "summary": "ranked Example",
+                  "description": "Example request body for the ranked profile.",
+                  "value": {
+                    "player_tickets": [
+                      {
+                        "player_ip": "174.25.48.238",
+                        "profile": "ranked",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      },
+                      {
+                        "player_ip": "217.34.85.142",
+                        "profile": "ranked",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      },
+                      {
+                        "player_ip": "136.224.30.243",
+                        "profile": "ranked",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGroupRequest"
+              },
+              "examples": {
+                "GroupRequest (casual)": {
+                  "summary": "casual Example",
+                  "description": "Example request body for the casual profile.",
+                  "value": {
+                    "player_tickets": [
+                      {
+                        "player_ip": "174.25.48.238",
+                        "profile": "casual",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      },
+                      {
+                        "player_ip": "217.34.85.142",
+                        "profile": "casual",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      },
+                      {
+                        "player_ip": "136.224.30.243",
+                        "profile": "casual",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                "GroupRequest (ranked)": {
+                  "summary": "ranked Example",
+                  "description": "Example request body for the ranked profile.",
+                  "value": {
+                    "player_tickets": [
+                      {
+                        "player_ip": "174.25.48.238",
+                        "profile": "ranked",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      },
+                      {
+                        "player_ip": "217.34.85.142",
+                        "profile": "ranked",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      },
+                      {
+                        "player_ip": "136.224.30.243",
+                        "profile": "ranked",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGroupRequest"
+              },
+              "examples": {
+                "GroupRequest (casual)": {
+                  "summary": "casual Example",
+                  "description": "Example request body for the casual profile.",
+                  "value": {
+                    "player_tickets": [
+                      {
+                        "player_ip": "174.25.48.238",
+                        "profile": "casual",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      },
+                      {
+                        "player_ip": "217.34.85.142",
+                        "profile": "casual",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      },
+                      {
+                        "player_ip": "136.224.30.243",
+                        "profile": "casual",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                "GroupRequest (ranked)": {
+                  "summary": "ranked Example",
+                  "description": "Example request body for the ranked profile.",
+                  "value": {
+                    "player_tickets": [
+                      {
+                        "player_ip": "174.25.48.238",
+                        "profile": "ranked",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      },
+                      {
+                        "player_ip": "217.34.85.142",
+                        "profile": "ranked",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      },
+                      {
+                        "player_ip": "136.224.30.243",
+                        "profile": "ranked",
+                        "attributes": {
+                          "beacons": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          },
+                          "selected_game_mode": "some string value",
+                          "selected_map": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupTicketResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/locations/beacons": {
+      "get": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "List all available location beacons",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BeaconListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/monitor": {
+      "get": {
+        "tags": [
+          "Monitor"
+        ],
+        "summary": "Returns the status of the service.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitorResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitorResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets": {
+      "post": {
+        "tags": [
+          "Ticket"
+        ],
+        "summary": "Create a matchmaking ticket",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTicketRequest"
+              },
+              "examples": {
+                "TicketRequest (casual)": {
+                  "summary": "casual Example",
+                  "description": "Example request body for the casual profile.",
+                  "value": {
+                    "player_ip": null,
+                    "profile": "casual",
+                    "attributes": {
+                      "beacons": {
+                        "Montreal": 12.3,
+                        "Toronto": 45.6,
+                        "Quebec": 78.9
+                      },
+                      "selected_game_mode": "some string value",
+                      "selected_map": [
+                        "value1",
+                        "value2",
+                        "value3"
+                      ]
+                    }
+                  }
+                },
+                "TicketRequest (ranked)": {
+                  "summary": "ranked Example",
+                  "description": "Example request body for the ranked profile.",
+                  "value": {
+                    "player_ip": null,
+                    "profile": "ranked",
+                    "attributes": {
+                      "beacons": {
+                        "Montreal": 12.3,
+                        "Toronto": 45.6,
+                        "Quebec": 78.9
+                      },
+                      "selected_game_mode": "some string value",
+                      "selected_map": [
+                        "value1",
+                        "value2",
+                        "value3"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadTicketResponse"
+                },
+                "example": {"id":"cqg0bg550h7uujd77khg","profile":"quickplay","group_id":null,"player_ip":null,"assignment":null,"created_at":"2024-08-20T13:38:08.251393+00:00","status":"SEARCHING"}
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/tickets/{ticketId}": {
+      "get": {
+        "tags": [
+          "Ticket"
+        ],
+        "summary": "Read a matchmaking ticket's information",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadTicketResponse"
+                },
+                "example": {"id":"cqg0bg550h7uujd77khg","profile":"quickplay","group_id":null,"player_ip":null,"assignment":{"fqdn":"cd28e6c66554.pr.edgegap.net","public_ip":"192.168.2.14","ports":{"game":{"internal":7777,"external":51123,"link":"cd28e6c66554.pr.edgegap.net:51123","protocol":"UDP"},"web":{"internal":8888,"external":51456,"link":"cd28e6c66554.pr.edgegap.net:51456","protocol":"TCP"}},"location":{"city":"Montreal","country":"Canada","continent":"North America","administrative_division":"Quebec","timezone":"America/Toronto"}},"created_at":"2024-08-20T13:38:08.251393+00:00","status":"SEARCHING"}
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                },
+                "example": {"message":"404 Not Found"}
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Ticket"
+        ],
+        "summary": "Delete a matchmaking ticket",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                },
+                "example": {"message":"404 Not Found"}
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiError": {
+        "title": "Error",
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "message": {
+            "minLength": 1,
+            "type": "string",
+            "description": "A message indicating what went wrong with the request.",
+            "example": "Some description of the error that occurred"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Information about an error that occurred."
+      },
+      "AssignmentLocationResponse": {
+        "title": "AssignmentLocation",
+        "required": [
+          "administrative_division",
+          "city",
+          "continent",
+          "country",
+          "timezone"
+        ],
+        "type": "object",
+        "properties": {
+          "city": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The city that the deployment is located in.",
+            "example": "Montreal"
+          },
+          "country": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The country that the deployment is located in.",
+            "example": "Canada"
+          },
+          "continent": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The continent that the deployment is located in.",
+            "example": "North America"
+          },
+          "administrative_division": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The administrative division that the deployment is located in.",
+            "example": "Quebec"
+          },
+          "timezone": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The timezone that the deployment is located in.",
+            "example": "America/Toronto"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Describes the location of a deployment."
+      },
+      "AssignmentPortResponse": {
+        "title": "AssignmentPort",
+        "required": [
+          "external",
+          "internal",
+          "link",
+          "protocol"
+        ],
+        "type": "object",
+        "properties": {
+          "internal": {
+            "type": "integer",
+            "description": "The port number that the process uses to listen for incoming connections.\r\nThis is the port that you configured in your game server.",
+            "format": "int32",
+            "example": 7777
+          },
+          "external": {
+            "type": "integer",
+            "description": "The port number that the game server is listening on.\r\nThis is the port that was dynamically assigned during your deployments, and is used to connect to the game\r\nserver. Requests made to this port will be forwarded to the internal port inside the deployment.",
+            "format": "int32",
+            "example": 51123
+          },
+          "link": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The link including the FQDN of the deployment and the port number that the game server is listening on.",
+            "example": "f1f37d6ca0ed.edgelab.io:51123"
+          },
+          "protocol": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The protocol that the game server is using.",
+            "example": "TCP"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Describes a port that a game server is listening on."
+      },
+      "BackfillSteps": {
+        "enum": [
+          "SEARCHING",
+          "ASSIGNED"
+        ],
+        "type": "string"
+      },
+      "BackfillTicketAttributes": {
+        "title": "BackfillRequestAttributes",
+        "required": [
+          "deployment_request_id"
+        ],
+        "type": "object",
+        "properties": {
+          "deployment_request_id": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The request ID of the deployment that was assigned to the server making the backfill request."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Attributes required to create a backfill ticket.",
+        "format": "json"
+      },
+      "BackfillTicketMember": {
+        "title": "BackfillTicketMember",
+        "required": [
+          "attributes",
+          "created_at",
+          "group_id",
+          "id",
+          "player_ip"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Id of the ticket"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Date created for the ticket.",
+            "format": "date-time"
+          },
+          "player_ip": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The Ip Address of the owning client"
+          },
+          "group_id": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Group ID of the ticket."
+          },
+          "attributes": {
+            "type": "object",
+            "additionalProperties": { },
+            "description": "List of field that will be used by the matchmaking rules.\r\nThe expected fields in this object are defined by the matchmaker configuration."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Describes a Ticket owned by a Backfill."
+      },
+      "BeaconListResponse": {
+        "title": "BeaconList",
+        "required": [
+          "beacons",
+          "count"
+        ],
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "description": "The number of available beacons.",
+            "format": "int32",
+            "example": 7
+          },
+          "beacons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadBeaconResponse"
+            },
+            "description": "The list of available beacons."
+          }
+        },
+        "additionalProperties": false,
+        "description": "List of the available beacons."
+      },
+      "BeaconLocationResponse": {
+        "title": "BeaconLocation",
+        "required": [
+          "administrative_division",
+          "city",
+          "continent",
+          "country",
+          "timezone"
+        ],
+        "type": "object",
+        "properties": {
+          "city": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The city that the deployment is located in.",
+            "example": "Montreal"
+          },
+          "country": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The country that the deployment is located in.",
+            "example": "Canada"
+          },
+          "continent": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The continent that the deployment is located in.",
+            "example": "North America"
+          },
+          "administrative_division": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The administrative division that the deployment is located in.",
+            "example": "Quebec"
+          },
+          "timezone": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The timezone that the deployment is located in.",
+            "example": "America/Toronto"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Describes the location of a deployment."
+      },
+      "CreateBackfillRequest": {
+        "oneOf": [
+          {
+            "title": "BackfillRequest (casual)",
+            "required": [
+              "attributes",
+              "profile",
+              "tickets"
+            ],
+            "type": "object",
+            "properties": {
+              "profile": {
+                "minLength": 1,
+                "type": "string",
+                "description": "The name of the matchmaking profile that the backfill is associated with.\r\nThis is used to determine which ruleset will be used to match the backfill.",
+                "example": "quickplay"
+              },
+              "attributes": {
+                "$ref": "#/components/schemas/BackfillTicketAttributes"
+              },
+              "tickets": {
+                "type": "object",
+                "additionalProperties": {
+                  "title": "BackfillTicketMember (casual)",
+                  "required": [
+                    "attributes",
+                    "created_at",
+                    "group_id",
+                    "id",
+                    "player_ip"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "minLength": 1,
+                      "type": "string",
+                      "description": "Id of the ticket"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "description": "Date created for the ticket.",
+                      "format": "date-time"
+                    },
+                    "player_ip": {
+                      "minLength": 1,
+                      "type": "string",
+                      "description": "The Ip Address of the owning client"
+                    },
+                    "group_id": {
+                      "minLength": 1,
+                      "type": "string",
+                      "description": "Group ID of the ticket."
+                    },
+                    "attributes": {
+                      "required": [
+                        "beacons",
+                        "selected_game_mode",
+                        "selected_map"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "beacons": {
+                          "minProperties": 1,
+                          "type": "object",
+                          "description": "Latencies object for the beacons rule.This should be a mapping of the region name to the average latency of the player to that location.",
+                          "example": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          }
+                        },
+                        "selected_game_mode": {
+                          "type": "string",
+                          "description": "String value for the selected_game_mode rule.This value must be the same for two tickets to match.",
+                          "example": "some string value"
+                        },
+                        "selected_map": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Field containing a list of values for the selected_map rule. The values must have at least 1 elements in common for two tickets to match.",
+                          "example": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "description": "The ticket attributes required for a ticket with the 'casual' game profile."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Describes a Ticket owned by a Backfill."
+                },
+                "description": "List of tickets already in the match."
+              }
+            },
+            "additionalProperties": false,
+            "description": "The backfill request for the 'casual' game profile.",
+            "format": "json"
+          },
+          {
+            "title": "BackfillRequest (ranked)",
+            "required": [
+              "attributes",
+              "profile",
+              "tickets"
+            ],
+            "type": "object",
+            "properties": {
+              "profile": {
+                "minLength": 1,
+                "type": "string",
+                "description": "The name of the matchmaking profile that the backfill is associated with.\r\nThis is used to determine which ruleset will be used to match the backfill.",
+                "example": "quickplay"
+              },
+              "attributes": {
+                "$ref": "#/components/schemas/BackfillTicketAttributes"
+              },
+              "tickets": {
+                "type": "object",
+                "additionalProperties": {
+                  "title": "BackfillTicketMember (ranked)",
+                  "required": [
+                    "attributes",
+                    "created_at",
+                    "group_id",
+                    "id",
+                    "player_ip"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "minLength": 1,
+                      "type": "string",
+                      "description": "Id of the ticket"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "description": "Date created for the ticket.",
+                      "format": "date-time"
+                    },
+                    "player_ip": {
+                      "minLength": 1,
+                      "type": "string",
+                      "description": "The Ip Address of the owning client"
+                    },
+                    "group_id": {
+                      "minLength": 1,
+                      "type": "string",
+                      "description": "Group ID of the ticket."
+                    },
+                    "attributes": {
+                      "required": [
+                        "beacons",
+                        "selected_game_mode",
+                        "selected_map"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "beacons": {
+                          "minProperties": 1,
+                          "type": "object",
+                          "description": "Latencies object for the beacons rule.This should be a mapping of the region name to the average latency of the player to that location.",
+                          "example": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          }
+                        },
+                        "selected_game_mode": {
+                          "type": "string",
+                          "description": "String value for the selected_game_mode rule.This value must be the same for two tickets to match.",
+                          "example": "some string value"
+                        },
+                        "selected_map": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Field containing a list of values for the selected_map rule. The values must have at least 1 elements in common for two tickets to match.",
+                          "example": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "description": "The ticket attributes required for a ticket with the 'ranked' game profile."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Describes a Ticket owned by a Backfill."
+                },
+                "description": "List of tickets already in the match."
+              }
+            },
+            "additionalProperties": false,
+            "description": "The backfill request for the 'ranked' game profile.",
+            "format": "json"
+          }
+        ],
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "profile",
+          "mapping": {
+            "casual": "BackfillRequest (casual)",
+            "ranked": "BackfillRequest (ranked)"
+          }
+        }
+      },
+      "CreateGroupRequest": {
+        "oneOf": [
+          {
+            "title": "GroupRequest (casual)",
+            "required": [
+              "player_tickets"
+            ],
+            "type": "object",
+            "properties": {
+              "player_tickets": {
+                "type": "array",
+                "items": {
+                  "title": "GroupPlayerTicket (casual)",
+                  "required": [
+                    "attributes",
+                    "player_ip",
+                    "profile"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "player_ip": {
+                      "minLength": 1,
+                      "type": "string",
+                      "description": "The IP address of the player."
+                    },
+                    "attributes": {
+                      "required": [
+                        "beacons",
+                        "selected_game_mode",
+                        "selected_map"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "beacons": {
+                          "minProperties": 1,
+                          "type": "object",
+                          "description": "Latencies object for the beacons rule.This should be a mapping of the region name to the average latency of the player to that location.",
+                          "example": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          }
+                        },
+                        "selected_game_mode": {
+                          "type": "string",
+                          "description": "String value for the selected_game_mode rule.This value must be the same for two tickets to match.",
+                          "example": "some string value"
+                        },
+                        "selected_map": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Field containing a list of values for the selected_map rule. The values must have at least 1 elements in common for two tickets to match.",
+                          "example": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "description": "The ticket attributes required for a ticket with the 'casual' game profile."
+                    },
+                    "profile": {
+                      "minLength": 1,
+                      "type": "string",
+                      "description": "The name of the matchmaking profile that the ticket should be associated with."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "The data of a single player within a matchmaking group.",
+                  "format": "json"
+                },
+                "description": "List of field that will be used by the matchmaking rules.\r\nThe expected fields in this object are defined by the matchmaker configuration."
+              }
+            },
+            "additionalProperties": false,
+            "description": "The backfill request for the 'casual' game profile.",
+            "format": "json"
+          },
+          {
+            "title": "GroupRequest (ranked)",
+            "required": [
+              "player_tickets"
+            ],
+            "type": "object",
+            "properties": {
+              "player_tickets": {
+                "type": "array",
+                "items": {
+                  "title": "GroupPlayerTicket (ranked)",
+                  "required": [
+                    "attributes",
+                    "player_ip",
+                    "profile"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "player_ip": {
+                      "minLength": 1,
+                      "type": "string",
+                      "description": "The IP address of the player."
+                    },
+                    "attributes": {
+                      "required": [
+                        "beacons",
+                        "selected_game_mode",
+                        "selected_map"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "beacons": {
+                          "minProperties": 1,
+                          "type": "object",
+                          "description": "Latencies object for the beacons rule.This should be a mapping of the region name to the average latency of the player to that location.",
+                          "example": {
+                            "Montreal": 12.3,
+                            "Toronto": 45.6,
+                            "Quebec": 78.9
+                          }
+                        },
+                        "selected_game_mode": {
+                          "type": "string",
+                          "description": "String value for the selected_game_mode rule.This value must be the same for two tickets to match.",
+                          "example": "some string value"
+                        },
+                        "selected_map": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Field containing a list of values for the selected_map rule. The values must have at least 1 elements in common for two tickets to match.",
+                          "example": [
+                            "value1",
+                            "value2",
+                            "value3"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "description": "The ticket attributes required for a ticket with the 'ranked' game profile."
+                    },
+                    "profile": {
+                      "minLength": 1,
+                      "type": "string",
+                      "description": "The name of the matchmaking profile that the ticket should be associated with."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "The data of a single player within a matchmaking group.",
+                  "format": "json"
+                },
+                "description": "List of field that will be used by the matchmaking rules.\r\nThe expected fields in this object are defined by the matchmaker configuration."
+              }
+            },
+            "additionalProperties": false,
+            "description": "The backfill request for the 'ranked' game profile.",
+            "format": "json"
+          }
+        ],
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "profile",
+          "mapping": {
+            "casual": "GroupRequest (casual)",
+            "ranked": "GroupRequest (ranked)"
+          }
+        }
+      },
+      "CreateTicketRequest": {
+        "oneOf": [
+          {
+            "title": "TicketRequest (casual)",
+            "required": [
+              "attributes",
+              "profile"
+            ],
+            "type": "object",
+            "properties": {
+              "player_ip": {
+                "type": "string",
+                "description": "The IP address of the player.",
+                "nullable": true
+              },
+              "profile": {
+                "minLength": 1,
+                "type": "string",
+                "description": "The name of the matchmaking profile that the ticket should be associated with."
+              },
+              "attributes": {
+                "required": [
+                  "beacons",
+                  "selected_game_mode",
+                  "selected_map"
+                ],
+                "type": "object",
+                "properties": {
+                  "beacons": {
+                    "minProperties": 1,
+                    "type": "object",
+                    "description": "Latencies object for the beacons rule.This should be a mapping of the region name to the average latency of the player to that location.",
+                    "example": {
+                      "Montreal": 12.3,
+                      "Toronto": 45.6,
+                      "Quebec": 78.9
+                    }
+                  },
+                  "selected_game_mode": {
+                    "type": "string",
+                    "description": "String value for the selected_game_mode rule.This value must be the same for two tickets to match.",
+                    "example": "some string value"
+                  },
+                  "selected_map": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Field containing a list of values for the selected_map rule. The values must have at least 1 elements in common for two tickets to match.",
+                    "example": [
+                      "value1",
+                      "value2",
+                      "value3"
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "description": "The ticket attributes required for a ticket with the 'casual' game profile."
+              }
+            },
+            "additionalProperties": false,
+            "description": "The ticket request for the 'casual' game profile.",
+            "format": "json"
+          },
+          {
+            "title": "TicketRequest (ranked)",
+            "required": [
+              "attributes",
+              "profile"
+            ],
+            "type": "object",
+            "properties": {
+              "player_ip": {
+                "type": "string",
+                "description": "The IP address of the player.",
+                "nullable": true
+              },
+              "profile": {
+                "minLength": 1,
+                "type": "string",
+                "description": "The name of the matchmaking profile that the ticket should be associated with."
+              },
+              "attributes": {
+                "required": [
+                  "beacons",
+                  "selected_game_mode",
+                  "selected_map"
+                ],
+                "type": "object",
+                "properties": {
+                  "beacons": {
+                    "minProperties": 1,
+                    "type": "object",
+                    "description": "Latencies object for the beacons rule.This should be a mapping of the region name to the average latency of the player to that location.",
+                    "example": {
+                      "Montreal": 12.3,
+                      "Toronto": 45.6,
+                      "Quebec": 78.9
+                    }
+                  },
+                  "selected_game_mode": {
+                    "type": "string",
+                    "description": "String value for the selected_game_mode rule.This value must be the same for two tickets to match.",
+                    "example": "some string value"
+                  },
+                  "selected_map": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Field containing a list of values for the selected_map rule. The values must have at least 1 elements in common for two tickets to match.",
+                    "example": [
+                      "value1",
+                      "value2",
+                      "value3"
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "description": "The ticket attributes required for a ticket with the 'ranked' game profile."
+              }
+            },
+            "additionalProperties": false,
+            "description": "The ticket request for the 'ranked' game profile.",
+            "format": "json"
+          }
+        ],
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "profile",
+          "mapping": {
+            "casual": "TicketRequest (casual)",
+            "ranked": "TicketRequest (ranked)"
+          }
+        }
+      },
+      "GroupPlayerTicket": {
+        "title": "GroupPlayerTicket",
+        "required": [
+          "attributes",
+          "player_ip",
+          "profile"
+        ],
+        "type": "object",
+        "properties": {
+          "player_ip": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The IP address of the player."
+          },
+          "attributes": {
+            "type": "object",
+            "additionalProperties": { },
+            "description": "The attributes of the ticket."
+          },
+          "profile": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The name of the matchmaking profile that the ticket should be associated with."
+          }
+        },
+        "additionalProperties": false,
+        "description": "The data of a single player within a matchmaking group.",
+        "format": "json"
+      },
+      "GroupTicketResponse": {
+        "title": "GroupTicketResponse",
+        "required": [
+          "player_tickets"
+        ],
+        "type": "object",
+        "properties": {
+          "player_tickets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadTicketResponse"
+            },
+            "description": "List of tickets that were created."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Response of the create group tickets request.",
+        "format": "json"
+      },
+      "MonitorResponse": {
+        "title": "Monitor",
+        "required": [
+          "healthy_components",
+          "message",
+          "status",
+          "unhealthy_components"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Monitor health status."
+          },
+          "message": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Health description message."
+          },
+          "healthy_components": {
+            "type": "integer",
+            "description": "number of healthy components.",
+            "format": "int32"
+          },
+          "unhealthy_components": {
+            "type": "integer",
+            "description": "number of unhealthy components.",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "List of the available beacons."
+      },
+      "ReadBackfillResponse": {
+        "title": "Backfill",
+        "required": [
+          "id",
+          "profile",
+          "status",
+          "tickets"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The ID of the backfill",
+            "example": "cqg0bg550h7uujd77khg"
+          },
+          "profile": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The name of the matchmaking profile that the backfill is associated with.\r\nThis is used to determine which ruleset will be used to match the backfill.",
+            "example": "quickplay"
+          },
+          "tickets": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/BackfillTicketMember"
+            },
+            "description": "List of tickets already in the match."
+          },
+          "status": {
+            "$ref": "#/components/schemas/BackfillSteps"
+          },
+          "assigned_ticket": {
+            "$ref": "#/components/schemas/BackfillTicketMember"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Describes a matchmaking ticket."
+      },
+      "ReadBeaconResponse": {
+        "title": "Beacons",
+        "required": [
+          "fqdn",
+          "location",
+          "public_ip",
+          "tcp_port",
+          "udp_port"
+        ],
+        "type": "object",
+        "properties": {
+          "fqdn": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The URL of the beacon.",
+            "example": "cd28e6c66554.edgegap.com"
+          },
+          "public_ip": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The public IP of the beacon.",
+            "example": "192.168.2.14"
+          },
+          "tcp_port": {
+            "type": "integer",
+            "description": "The port to use for TCP pings.",
+            "format": "int32",
+            "example": 51123
+          },
+          "udp_port": {
+            "type": "integer",
+            "description": "The port to use for UDP pings.",
+            "format": "int32",
+            "example": 51456
+          },
+          "location": {
+            "$ref": "#/components/schemas/BeaconLocationResponse"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Describes a beacon that can be pinged to test latency of a user."
+      },
+      "ReadTicketResponse": {
+        "title": "Ticket",
+        "required": [
+          "created_at",
+          "group_id",
+          "id",
+          "player_ip",
+          "profile",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The ID of the ticket",
+            "example": "cqg0bg550h7uujd77khg"
+          },
+          "profile": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The name of the matchmaking profile that the ticket is associated with.\r\nThis is used to determine which ruleset will be used to match the ticket.",
+            "example": "quickplay"
+          },
+          "group_id": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Group id of the ticket."
+          },
+          "player_ip": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Ip address of the player."
+          },
+          "assignment": {
+            "$ref": "#/components/schemas/TicketAssignmentResponse"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "The time that the ticket was created.",
+            "format": "date-time",
+            "example": "2022-01-01T12:00:00Z"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TicketSteps"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Describes a matchmaking ticket."
+      },
+      "TicketAssignmentResponse": {
+        "title": "Assignment",
+        "required": [
+          "fqdn",
+          "location",
+          "ports",
+          "public_ip"
+        ],
+        "type": "object",
+        "properties": {
+          "fqdn": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The URL of the game server that the ticket has been assigned to.",
+            "example": "cd28e6c66554.pr.edgegap.net"
+          },
+          "public_ip": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The public IP of the game server that the ticket has been assigned to.",
+            "example": "192.168.2.14"
+          },
+          "ports": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/AssignmentPortResponse"
+            },
+            "description": "A mapping of the configured port names to the port configuration that the game server is listening on."
+          },
+          "location": {
+            "$ref": "#/components/schemas/AssignmentLocationResponse"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Describes the assignment of a ticket to a game server."
+      },
+      "TicketSteps": {
+        "enum": [
+          "SEARCHING",
+          "TEAM_FOUND",
+          "MATCH_FOUND",
+          "HOST_ASSIGNED",
+          "CANCELLED"
+        ],
+        "type": "string"
+      }
+    }
+  }
+}

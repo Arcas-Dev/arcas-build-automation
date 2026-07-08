@@ -104,10 +104,14 @@ Mirror `UGrenadeTotemGameplayAbility`'s montage→event→spawn flow. Base TBD: 
 
 ## 6. Hitscan ranged weapons — trace, range & impact VFX (added 2026-07-05, **rewritten + FIXED 2026-07-08**)
 
-> **AS-BUILT (2026-07-08, commit `2910a4321` on `deploy/steam-testing`)** — `MaxTraceRange` added to `ULyraRangedWeaponInstance`; `:402` now uses `GetMaxTraceRange()`. Default `-1` = fall back to `MaxDamageRange`, so **no weapon changes behaviour until authored** in its `B_WeaponInstance_*` asset. Caps every pellet, since `EndTrace` is computed inside the `BulletsPerCartridge` loop.
-> **⚠️ NOT YET COMPILED** — build VM stocked out (L4 unavailable, `europe-west6-b`).
-> **⚠️ Blueprint cleanup still owed** — delete the `Add Limit to trace` box + `TraceMaxDistance` / `Object Types` vars from `GA_Weapon_Fire`. **C++ first, recompile, then delete**, or the graph breaks in between.
-> Diagram: `arcas-champions/docs/weapon-trace-clamp-fix.drawio.svg` (+ `.png`) — note its "change #1" is superseded by the C++ fix; keep it only for the *why it failed* explanation.
+> **AS-BUILT (2026-07-08) — two commits on `deploy/steam-testing`:**
+> 1. **`2910a4321`** — `MaxTraceRange` added to `ULyraRangedWeaponInstance`; `:402` now uses `GetMaxTraceRange()`. Default `-1` = fall back to `MaxDamageRange`, so **no weapon changes behaviour until authored** in its `B_WeaponInstance_*` asset. Caps every pellet, since `EndTrace` is computed inside the `BulletsPerCartridge` loop.
+> 2. **`f85da3aa0`** — the `:429` per-pellet fix (see "the shotgun tracer bug" below). Required because capping the trace alone still left 3 of a 4-pellet shotgun's tracers unsourced.
+>
+> ✅ **Compiles**; `Max Trace Range` confirmed visible in `Weapon Config` on the `B_WeaponInstance_*` assets.
+> ✅ **Blueprint cleanup DONE** — the `Add Limit to trace` box + `TraceMaxDistance` / `Object Types` vars have been deleted from `GA_Weapon_Fire`.
+> ⬜ **Per-weapon tuning still owed** — every weapon is still at `-1`. PlasmaShotgun was set to 1000 cm during testing; verify that's intended (it's a 10 m gun).
+> Diagram: `arcas-champions/docs/weapon-trace-clamp-fix.drawio.svg` (+ `.png`) — **historical only.** Its "change #1" (rewire the `>` node) was superseded; the Blueprint it describes no longer exists. Keep it for the *why the clamp never fired* explanation.
 
 ### Correcting the original 2026-07-05 diagnosis
 The first pass here claimed traces had **"effectively infinite range"** and that the offending guns had `MaxDamageRange` "cranked very high". **Both were wrong.** Read off the actual assets:
@@ -170,10 +174,36 @@ That hit result is packed into `FLyraGameplayAbilityTargetData_SingleTargetHit` 
 
 Both are structural, which is why the fix moved to C++ at `:402` — `EndTrace` is per-pellet, so all pellets are capped, and a wall inside the cap gets a normal decal.
 
-### ⚠️ Two latent multi-pellet bugs (pre-existing Lyra, NOT introduced by the fix)
-Both stem from `OutHits` being a **single array shared across all pellets** in `TraceBulletsInCartridge`:
-- **`:429`** — `if (OutHits.Num() == 0)`: once pellet 0 adds anything, pellets 1–2 can never plant a fake impact. A shotgun that misses everything draws **one** beam, not three.
-- **`:309` / `:314`** — `if (FindFirstPawnHitResult(OutHits) == INDEX_NONE)`: once *any* pellet hits a pawn, remaining pellets **skip tracing entirely**. A shotgun may register only **one pellet's** damage on a player. Worth chasing independently.
+### The shotgun tracer bug — `:429`, fixed in `f85da3aa0`
+**How the beams are actually drawn** (traced through the assets, 2026-07-08):
+```
+TraceBulletsInCartridge → OutHits → FLyraGameplayAbilityTargetData_SingleTargetHit (:597)
+  → one GameplayCue execution PER TARGET-DATA ENTRY
+    → GCN_Weapon_<Weapon>_Fire :: On Burst
+       Break Gameplay Cue Parameters → Location (a SINGLE FVector) → Make Array → Fire(ImpactPositions, …)
+       → NS_WeaponFire_Tracer_<Weapon> :: Set PARTICLES.HitPosition
+            = Select Vector from Array( USER.ImpactPositions, index = Return Exec Index, mode = Clamp )
+```
+So **one target-data entry = one tracer**. The old guard was cumulative:
+```cpp
+if (OutHits.Num() == 0) { /* plant fake impact at EndTrace, add to OutHits */ }
+```
+`OutHits` is shared across the whole cartridge, so once pellet 0 added an entry, **any later pellet that hit nothing contributed no hit result at all** → no cue execution → no tracer, and the surviving tracers indexed past the end of `ImpactPositions` (defaults `0,0,0` → beams toward world origin). A pellet that *hits* always appends via `OutHits.Append(AllImpacts)`, so the bug only ever dropped **misses** — and it also **shifted the `ExecIndex → pellet` mapping**, wiring surviving tracers to the wrong pellets' endpoints.
+
+Single-pellet weapons are structurally immune, which is why only shotguns showed it.
+
+**Empirically confirmed before fixing** (Marco, in Editor): point-blank into a wall → all 4 pellets hit → all 4 beams correct. Aiming at open sky → **exactly one beam** from a 4-pellet gun. That one-beam result is what proved the cue count follows target-data entries (a Niagara/GCN-side fix would have been a no-op — those executions never happened).
+
+Fix: make the guard per-pellet — `if (!HitActor || AllImpacts.Num() == 0)`.
+
+### ❌ Correction: there is NO cross-pellet pawn short-circuit
+An earlier draft of this doc claimed `:309`/`:314` (`FindFirstPawnHitResult(OutHits) == INDEX_NONE`) short-circuits tracing across pellets once any pellet hits a pawn, so a shotgun would register only one pellet's damage. **That is wrong.** `AllImpacts` is declared *inside* the pellet loop (`:405`) and is what's passed to `DoSingleBulletTrace`, so `FindFirstPawnHitResult` only ever sees the **current pellet's** hits. Every pellet traces. No damage is lost.
+
+### ⚠️ Known remaining imprecision (not fixed)
+`WeaponTrace` uses `LineTraceMultiByChannel` and appends **every** non-duplicate hit, so a single pellet can still contribute **more than one** entry (e.g. shooting through foliage). The `ExecIndex → pellet` mapping the Niagara system assumes is therefore still not strictly 1:1. Correct in the common case. A proper fix would hand the cue an explicit per-pellet endpoint array rather than inferring it from hit count.
+
+### ⚠️ Watch after `f85da3aa0`
+Misses now reach `AddUnconfirmedServerSideHitMarkers` (`:609`) and replicate (a 4-pellet miss sends 4 hit results, not 1). Misses carry no `HitActor` so `GE_Damage` cannot apply — but **if hit markers key off entry count rather than a valid pawn, expect phantom hitmarkers when missing.** Untested.
 
 ### Damage is genuinely independent of the trace length
 `ULyraRangedWeaponInstance::GetDistanceAttenuation` (`LyraRangedWeaponInstance.cpp:125`):

@@ -104,6 +104,8 @@ Mirror `UGrenadeTotemGameplayAbility`'s montage→event→spawn flow. Base TBD: 
 
 ## 6. Hitscan ranged weapons — trace, range & impact VFX (added 2026-07-05, **rewritten + FIXED 2026-07-08**)
 
+> **⏸️ PARKED 2026-07-08 (low priority).** C++ is done, compiled and proven correct by logging. What remains is Editor-side only — see **§6b** below for the measured evidence, the exact fix, and the trap to avoid.
+>
 > **AS-BUILT (2026-07-08) — two commits on `deploy/steam-testing`:**
 > 1. **`2910a4321`** — `MaxTraceRange` added to `ULyraRangedWeaponInstance`; `:402` now uses `GetMaxTraceRange()`. Default `-1` = fall back to `MaxDamageRange`, so **no weapon changes behaviour until authored** in its `B_WeaponInstance_*` asset. Caps every pellet, since `EndTrace` is computed inside the `BulletsPerCartridge` loop.
 > 2. **`f85da3aa0`** — the `:429` per-pellet fix (see "the shotgun tracer bug" below). Required because capping the trace alone still left 3 of a 4-pellet shotgun's tracers unsourced.
@@ -204,6 +206,69 @@ An earlier draft of this doc claimed `:309`/`:314` (`FindFirstPawnHitResult(OutH
 
 ### ⚠️ Watch after `f85da3aa0`
 Misses now reach `AddUnconfirmedServerSideHitMarkers` (`:609`) and replicate (a 4-pellet miss sends 4 hit results, not 1). Misses carry no `HitActor` so `GE_Damage` cannot apply — but **if hit markers key off entry count rather than a valid pawn, expect phantom hitmarkers when missing.** Untested.
+
+---
+
+## 6b. Shotgun tracers — PARKED, low priority (2026-07-08)
+
+**Status: the C++ is DONE and PROVEN. The remaining bug is entirely Editor-side (Blueprint + Niagara).**
+
+### Measured ground truth
+Temporary `UE_LOG` after `PerformLocalTargeting` (added as `b5a830ced`, reverted as `cf9e5bb23` — re-add it if you pick this up). PlasmaShotgun fired at open sky:
+```
+[TRACE] BulletsPerCartridge=4  MaxTraceRange=1000  FoundHits=4
+[TRACE]   [0] blocking=0  actor=None  dist=1000
+[TRACE]   [1] blocking=0  actor=None  dist=1000
+[TRACE]   [2] blocking=0  actor=None  dist=1000
+[TRACE]   [3] blocking=0  actor=None  dist=1000
+```
+Four target-data entries, one per pellet, each capped at exactly `MaxTraceRange`. **`MaxTraceRange` works. The `:429` per-pellet fix works.** In-game you still see **one** beam — so the cosmetic layer is discarding three of four hit results.
+
+### Where they're discarded
+`GA_Weapon_Fire` → `Event OnRangedWeaponTargetDataReady` → **`Get Hit Result from Target Data`, hardcoded `Index 0`.** Entries 1–3 are dropped there. One hit result → one cue execution → one tracer. Every downstream node is faithfully processing the single hit result it was handed.
+
+The same `Index 0` read also feeds **impact decals and surface-type sounds** → one decal per cartridge, not one per pellet.
+
+### The cosmetic chain (traced through the assets)
+```
+GA_Weapon_Fire (Index 0!) → GameplayCue → GCN_Weapon_<W>_Fire :: On Burst
+  Break Gameplay Cue Parameters → Location (a SINGLE FVector)
+    → Make Array (1 element) → Fire(ImpactPositions, ImpactNormals, ImpactSurfaceTypes)
+      → B_WeaponFire :: EventGraph
+          "Niagara Set Vector Array"  Override Name = User.ImpactPositions   ← OVERWRITES whole array
+          "Set Niagara Variable (Bool)" User.Trigger                          ← fires the burst
+            → NS_WeaponFire_Tracer_<W> :: Set PARTICLES.HitPosition
+                 = Select Vector from Array( USER.ImpactPositions,
+                                             index = Return Exec Index,
+                                             mode  = Clamp )
+```
+
+### ⚠️ The trap — do NOT "just ForEach the cue"
+The obvious fix (ForEach target data → execute the cue 4×) **will still produce one beam.** `Niagara Set Vector Array` overwrites the *entire* `User.ImpactPositions` on a Niagara component **shared by the weapon actor**, then trips `User.Trigger`. Four executions in one frame clobber each other before Niagara ticks. Last write wins.
+
+`ImpactPositions[ExecIndex]` + `Clamp` tells you the intended design: **ONE call carrying all N endpoints, Niagara spawning N particles**, each reading its own index. Not N calls of 1 element.
+
+### The fix (when picked up)
+1. **C++** — add a helper so the BP can't mis-index (the three arrays must stay index-aligned):
+   ```cpp
+   UFUNCTION(BlueprintCallable, Category="Weapon")
+   static void GetImpactsFromTargetData(const FGameplayAbilityTargetDataHandle& TargetData,
+       TArray<FVector>& OutImpactPositions, TArray<FVector>& OutImpactNormals,
+       TArray<TEnumAsByte<EPhysicalSurface>>& OutImpactSurfaceTypes);
+   ```
+2. **`GA_Weapon_Fire`** — delete `Get Hit Result from Target Data (Index 0)`, replace with the helper, route the three arrays onward.
+3. **`NS_WeaponFire_Tracer_*`** — ⚠️ **mandatory, or nothing changes**: `Emitter Update → Spawn Per Frame` must spawn **one particle per array element** (add a `User.NumImpacts` int set alongside the array, or read the array length in Niagara). Spawn 1 → it reads index 0 → screen looks identical to today.
+4. **`GCN_Weapon_<W>_Fire`** — remove the `Location → Make Array → Impact Positions` wiring. Keep sound / whiz-by / early reflections (genuinely per-shot).
+5. Repeat 3–4 for **all three shotguns**: `Shotgun`, `PlasmaShotgun`, `DBShotgun` each have their own `GCN_` and tracer NS.
+
+### Open unknowns (blockers for a precise spec)
+- **The `Fire` function on `B_WeaponFire`** — is it BlueprintCallable from the GA, or reachable only from the cue notify? Because `FGameplayCueParameters` carries a single `Location`, the array **cannot** travel through the cue; the GA must call the weapon actor directly, or the tracer trigger must move out of the cue entirely.
+- **How the GA gets the weapon actor reference** (`ULyraGameplayAbility_FromEquipment` has the equipment instance; the actor comes from `ActorsToSpawn`).
+- **`Spawn Per Frame` config** in the tracer NS — fixed count or data-driven?
+
+### Also still open (data-side, no build needed)
+- **Per-weapon `MaxTraceRange` tuning.** Everything is still `-1` (= `MaxDamageRange`) except **PlasmaShotgun = 1000 cm**, set during testing. That makes it a 10 m gun that cannot register a hit at 11 m, and kills ~30 m of its falloff curve (last key ~4096). **Verify that's intended.**
+- **Falloff curves bottom out at 0.50, not 0.0** — see §6 above.
 
 ### Damage is genuinely independent of the trace length
 `ULyraRangedWeaponInstance::GetDistanceAttenuation` (`LyraRangedWeaponInstance.cpp:125`):

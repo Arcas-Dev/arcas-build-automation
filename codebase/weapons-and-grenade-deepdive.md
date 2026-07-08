@@ -102,9 +102,25 @@ Mirror `UGrenadeTotemGameplayAbility`'s montage→event→spawn flow. Base TBD: 
 
 ---
 
-## 6. Hitscan ranged weapons — trace, range & impact VFX (added 2026-07-05)
+## 6. Hitscan ranged weapons — trace, range & impact VFX (added 2026-07-05, **rewritten + FIXED 2026-07-08**)
 
-Investigated for Marco's bug: **ranged-weapon traces have effectively infinite range** → bullet-hole decals and beam VFX (incl. his MadBlower **waterbeam**) shoot off to the horizon on a miss; worst on shotguns. His diagnosis was correct: **damage is capped separately, the trace/VFX is not.**
+> **AS-BUILT (2026-07-08, commit `2910a4321` on `deploy/steam-testing`)** — `MaxTraceRange` added to `ULyraRangedWeaponInstance`; `:402` now uses `GetMaxTraceRange()`. Default `-1` = fall back to `MaxDamageRange`, so **no weapon changes behaviour until authored** in its `B_WeaponInstance_*` asset. Caps every pellet, since `EndTrace` is computed inside the `BulletsPerCartridge` loop.
+> **⚠️ NOT YET COMPILED** — build VM stocked out (L4 unavailable, `europe-west6-b`).
+> **⚠️ Blueprint cleanup still owed** — delete the `Add Limit to trace` box + `TraceMaxDistance` / `Object Types` vars from `GA_Weapon_Fire`. **C++ first, recompile, then delete**, or the graph breaks in between.
+> Diagram: `arcas-champions/docs/weapon-trace-clamp-fix.drawio.svg` (+ `.png`) — note its "change #1" is superseded by the C++ fix; keep it only for the *why it failed* explanation.
+
+### Correcting the original 2026-07-05 diagnosis
+The first pass here claimed traces had **"effectively infinite range"** and that the offending guns had `MaxDamageRange` "cranked very high". **Both were wrong.** Read off the actual assets:
+
+| Weapon (`B_WeaponInstance_*`) | `MaxDamageRange` | Pellets | Sweep radius | Falloff last key |
+|---|---|---|---|---|
+| MadRifle | 15000 cm (150 m) | 1 | 5.5 cm | ~8192 cm |
+| Shotgun  | 5000 cm (50 m)   | 3 | 0.4 cm | ~3072 cm |
+
+The trace was always bounded — just *long*. Three further corrections:
+- **`MaxDamageRange` is never assigned in C++**; the only occurrence is the `25000.0f` default. Per-weapon values are class defaults on the **`B_WeaponInstance_*`** blueprints. It is **not** on `WID_*` — those are `ULyraEquipmentDefinition` (only `InstanceType`, `AbilitySetsToGrant`, `ActorsToSpawn`).
+- **`EndAim` (`:371`) is dead code** — written once, never read anywhere. There is no "aim trace" to preserve.
+- The runtime stats system (`FBASRangedWeaponStatsSettings::TryApplyStats`) tunes only Power / Spread / Handling / `DistanceDamageFalloffCoefficient`. **It cannot touch range.**
 
 ### Where the trace happens (all base Lyra — BAS does NOT override it)
 `Source/LyraGame/Weapons/` — `UBASGameplayAbility_RangedWeapon` overrides **only** `IsDataValid`; the whole trace path is inherited from `ULyraGameplayAbility_RangedWeapon`:
@@ -116,22 +132,48 @@ StartRangedWeaponTargeting / PerformLocalTargeting
           → WeaponTrace        (:146)   the actual LineTraceMultiByChannel / SweepMultiByChannel
 ```
 
-### The single range knob = `MaxDamageRange`
-The bullet trace end is computed at **`LyraGameplayAbility_RangedWeapon.cpp:402`**:
+### The range knob — was `MaxDamageRange`, now `MaxTraceRange`
+The bullet trace end is computed at **`LyraGameplayAbility_RangedWeapon.cpp:402`**, inside the per-pellet loop:
 ```cpp
-const FVector EndTrace = InputData.StartTrace + (BulletDir * WeaponData->GetMaxDamageRange());
+const FVector EndTrace = InputData.StartTrace + (BulletDir * WeaponData->GetMaxTraceRange());  // was GetMaxDamageRange()
 ```
-`MaxDamageRange` lives on `ULyraRangedWeaponInstance` (`LyraRangedWeaponInstance.h:185`, C++ default **25000 = 250 m**, overridden per-weapon in the data assets — the offending guns have it cranked very high). The same value drives the **aim** trace at `:371` (`EndAim`). `GetBulletTraceSweepRadius()` (`:189`, default 0 = pure ray) is the pellet "thickness".
-
-### Why a miss draws the beam/hole to infinity (the VFX smoking gun)
-`TraceBulletsInCartridge` **:428-436** — when a pellet hits nothing it plants a *fake* impact at the trace end so tracers/beams still have an endpoint:
+Both live on `ULyraRangedWeaponInstance` (`LyraRangedWeaponInstance.h`) and are `EditAnywhere` → authored per weapon on `B_WeaponInstance_*`:
 ```cpp
-if (!Impact.bBlockingHit) {
-    Impact.Location    = EndTrace;   // = StartTrace + dir * MaxDamageRange
-    Impact.ImpactPoint = EndTrace;
+float MaxDamageRange = 25000.0f;   // 250 m default
+float MaxTraceRange  = -1.0f;      // -1 = use MaxDamageRange
+float GetMaxTraceRange() const { return MaxTraceRange > 0.0f ? MaxTraceRange : MaxDamageRange; }
+```
+`GetBulletTraceSweepRadius()` (default 0 = pure ray) is the pellet "thickness".
+
+**Tuning rule:** don't set `MaxTraceRange` below the falloff curve's last key, or you delete damage that currently lands. Above it you're only trimming the flat extrapolated tail. Suggested: Shotgun ~3000, MadRifle ~8200.
+
+### Why a miss draws the beam/hole to the horizon (the VFX smoking gun)
+`TraceBulletsInCartridge` **:429-436** — when a pellet hits nothing it plants a *fake* impact at the trace end so tracers/beams still have an endpoint:
+```cpp
+if (OutHits.Num() == 0) {
+    if (!Impact.bBlockingHit) {
+        Impact.Location    = EndTrace;   // full trace range downrange
+        Impact.ImpactPoint = EndTrace;
+    }
+    OutHits.Add(Impact);
 }
 ```
-That hit result is packed into `FLyraGameplayAbilityTargetData_SingleTargetHit` (`:597-599`) and drives the cosmetic layer. So **Marco's waterbeam + the bullet-hole decal read `ImpactPoint`** → on a miss they extend all the way to `MaxDamageRange`. Shotguns are worst because **each pellet** gets its own full-length trace → several long beams/holes at once.
+That hit result is packed into `FLyraGameplayAbilityTargetData_SingleTargetHit` (`:597-599`) and drives the cosmetic layer, so the waterbeam + bullet-hole decal read `ImpactPoint` → on a miss they extend to the full trace range.
+
+**Crucially, `Distance` is NOT rewritten here.** `WeaponTrace` starts with `FHitResult Hit(ForceInit)` → `Distance = 0`, and on no-hit sets only `TraceStart`/`TraceEnd`. So a clean miss arrives at the cosmetic layer as `bBlockingHit=false, Distance=0, ImpactPoint=<full range>`. This is what defeated the old Blueprint clamp (below).
+
+### The dead Blueprint clamp — `GA_Weapon_Fire` → `Add Limit to trace` (to be deleted)
+`GA_Weapon_Fire` (parent: `UBASGameplayAbility_RangedWeapon`) had a BP variable **`TraceMaxDistance`** wired into a comment box that broke the hit result, tested `Distance > TraceMaxDistance`, and on true swapped `Location`/`ImpactPoint` for `TraceStart + Normalize(TraceEnd - TraceStart) * TraceMaxDistance` via four `Select Vector` nodes, feeding a rebuilt `Make Hit Result`. **It was never orphaned — it was broken, in two ways:**
+
+1. **Predicate keys off `Distance`, which is `0` on a miss.** `0 > TraceMaxDistance` is false → the unclamped `ImpactPoint` passes straight through. The clamp therefore only ever fired on *genuine blocking hits* beyond the limit — visible in-game as "bullet mark appears on a wall under ~50 m, disappears when you walk back", which is the clamp firing and (wrongly) suppressing a legitimate decal via its `NOT` → `Blocking Hit` wire.
+2. **It reads `Get Hit Result from Target Data` at `Index 0` only.** Single-pellet rifles look fine; on a 3-pellet shotgun only the first pellet is clamped and pellets 1–2 draw unclamped. This is why "the Blueprint works for normal bullets but not for shotguns."
+
+Both are structural, which is why the fix moved to C++ at `:402` — `EndTrace` is per-pellet, so all pellets are capped, and a wall inside the cap gets a normal decal.
+
+### ⚠️ Two latent multi-pellet bugs (pre-existing Lyra, NOT introduced by the fix)
+Both stem from `OutHits` being a **single array shared across all pellets** in `TraceBulletsInCartridge`:
+- **`:429`** — `if (OutHits.Num() == 0)`: once pellet 0 adds anything, pellets 1–2 can never plant a fake impact. A shotgun that misses everything draws **one** beam, not three.
+- **`:309` / `:314`** — `if (FindFirstPawnHitResult(OutHits) == INDEX_NONE)`: once *any* pellet hits a pawn, remaining pellets **skip tracing entirely**. A shotgun may register only **one pellet's** damage on a player. Worth chasing independently.
 
 ### Damage is genuinely independent of the trace length
 `ULyraRangedWeaponInstance::GetDistanceAttenuation` (`LyraRangedWeaponInstance.cpp:125`):
@@ -139,15 +181,21 @@ That hit result is packed into `FLyraGameplayAbilityTargetData_SingleTargetHit` 
 const FRichCurve* Curve = DistanceDamageFalloff.GetRichCurveConst();
 return Curve->HasAnyData() ? Curve->Eval(Distance) : 1.0f;   // sampled by ABSOLUTE distance, NOT normalized by MaxDamageRange
 ```
-BAS adds the curve + a `DistanceDamageFalloffCoefficient` on `UBASRangedWeaponInstance` (`BASRangedWeaponInstance.cpp:254` scales the curve's time keys; tuned data-side by `FBASRangedWeaponStatsSettings`). **So shrinking the trace won't touch the damage model** — exactly Marco's assumption.
+BAS adds the curve + a `DistanceDamageFalloffCoefficient` on `UBASRangedWeaponInstance` (`BASRangedWeaponInstance.cpp:254` scales the curve's time keys; tuned data-side by `FBASRangedWeaponStatsSettings`).
 
-### The fix (TODO — logged in project CLAUDE.md → Game Features)
-Add a backward-compatible cosmetic **`MaxTraceRange`** on `UBASRangedWeaponInstance`:
-- default **-1** = "fall back to `MaxDamageRange`" so nothing changes until set per weapon;
-- use it for the **bullet** trace's `EndTrace` (`:402`) only; **leave the aim trace `:371` on `MaxDamageRange`** so aiming at distant targets still converges the bullet direction correctly;
-- tune per weapon in the data asset (shotgun short ~2000-3500 cm, rifles long).
+**But note the `HasAnyData()` ternary and `FRichCurve`'s default constant extrapolation:** past the last key the curve returns that key's value, and an *empty* curve returns `1.0f` at any distance. Both shipped curves bottom out at **0.50, not 0.0** — so the MadRifle does flat 50% damage from 82 m → 150 m, and the **shotgun does 50% per pellet from 30 m → 50 m**. That is a *data* bug, independent of the trace, and likely a large part of what players feel as "this gun reaches forever". **Curves should reach 0.0.** Editor-side, no build needed.
 
-**Caveat:** capping the bullet trace also caps where a hit can *register* (no damage past where you trace). Fine as long as `MaxTraceRange` ≥ the distance where the falloff curve reaches ~0 damage — always true for a shotgun; just don't cut a rifle's trace shorter than its effective damage range. Small one-line C++ change + one property; all tuning is then data-side for Marco.
+Deliberately **not** addressed by the `MaxTraceRange` change (Dan, 2026-07-08: *"don't focus so much on the damage"*).
+
+### ⚠️ Suspected: `SetDistanceDamageFalloffCoefficient` compounds
+`BASRangedWeaponInstance.cpp:258-261` multiplies the curve's `Key.Time` **in place**:
+```cpp
+for (FRichCurveKey& Key : DistanceDamageFalloff.GetRichCurve()->Keys) { Key.Time *= DistanceDamageFalloffCoefficient; }
+```
+Call it twice on the same instance and the scaling compounds. Probably safe if instances are fresh per-equip — **instance lifetime not verified.**
+
+### Caveat carried by the shipped fix
+Capping the bullet trace also caps where a hit can **register** (no damage past where you trace). Dan signed off on this explicitly (2026-07-08: *"capping where a hit can register based on its trace ending is fine, makes sense"*). Keep `MaxTraceRange` ≥ the falloff curve's last key unless the damage loss is intended.
 
 ### Related weapon data-flow facts (from the vault work)
 New guns (MadRifle, MadBlower) are added by authoring the C++/BP weapon assets + editing `DT_AllVaultItems` — see [[barracks-vault-flow]]. The MadBlower's waterbeam is the VFX that surfaced this trace-range issue.

@@ -289,12 +289,35 @@ try {
         -Headers $headers `
         -Body $body
 
-    Log "Edgegap PATCH SUCCESS"
+    Log "Edgegap PATCH returned OK - verifying the tag actually applied..."
+
+    # A 200 is NOT proof the tag changed. Read it back. (2026-07-08: a PATCH was
+    # rejected for over-quota req_cpu/req_memory while the pipeline still reported
+    # COMPLETE, leaving a 5-month-old server image live against a fresh client.)
+    $applied = Invoke-RestMethod `
+        -Uri "https://api.edgegap.com/v1/app/$EdgegapApp/version/$EdgegapVersion" `
+        -Method Get `
+        -Headers $headers
+
+    $liveTag = $applied.version.docker_tag
+    if ($liveTag -ne $dockerTag) {
+        throw "Edgegap still reports docker_tag '$liveTag', expected '$dockerTag'"
+    }
+
+    Log "Edgegap PATCH SUCCESS (verified)"
     Log "Version '$EdgegapVersion' now points to docker_tag '$dockerTag'"
 } catch {
-    Log "WARNING: Edgegap PATCH failed: $_"
-    Log "You can manually update via Dashboard or retry:"
-    Log "  curl -X PATCH -H 'Authorization: token $EdgegapToken' -H 'Content-Type: application/json' https://api.edgegap.com/v1/app/$EdgegapApp/version/$EdgegapVersion -d '{`"docker_tag`":`"$dockerTag`"}'"
+    Log "ERROR: Edgegap PATCH failed: $_"
+    Log ""
+    Log "The Steam client was uploaded but the dedicated server image was NOT updated."
+    Log "Do NOT test multiplayer until this is resolved - the client and server will mismatch."
+    Log ""
+    Log "Common cause: Edgegap revalidates the WHOLE version object on any PATCH, so an"
+    Log "over-quota req_cpu / req_memory rejects the request even though only docker_tag"
+    Log "was sent. Check the account limits, then retry including the resource fields:"
+    Log "  curl -X PATCH -H 'Authorization: token $EdgegapToken' -H 'Content-Type: application/json' https://api.edgegap.com/v1/app/$EdgegapApp/version/$EdgegapVersion -d '{`"docker_tag`":`"$dockerTag`",`"req_cpu`":1536,`"req_memory`":3072}'"
+    UpdateStatus "EDGEGAP_PATCH_FAILED:$dockerTag"
+    exit 1
 }
 Log ''
 

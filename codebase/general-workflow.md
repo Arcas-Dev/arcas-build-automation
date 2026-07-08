@@ -348,6 +348,27 @@ Already available (no need to add to .Build.cs):
 
 ---
 
+## ⚠️ Editing PowerShell scripts on the VM — three traps
+
+**1. NEVER put non-ASCII characters in a `.ps1`.** An em dash (`—`, U+2014) in a comment or `Log` string will **break the parser**, and the error will point at a line ~50 further down that looks perfectly fine.
+
+Why: the file is UTF-8 without BOM, PowerShell 5.1 reads it as Windows-1252, so the three UTF-8 bytes `E2 80 94` decode to `â€”` — and that trailing `0x94` is `”` (RIGHT DOUBLE QUOTATION MARK), **which PowerShell accepts as a string delimiter.** It opens a phantom string that swallows everything until the next quote. Cost an hour on 2026-07-08. Same applies to `’`, `“`, `”`, `…`, arrows. Use ASCII: `-`, `'`, `"`, `...`, `->`.
+
+Check before uploading: `LC_ALL=C grep -n '[^ -~\t]' script.ps1` (no output = clean).
+
+**2. Always syntax-check on the VM before overwriting a working script.** A broken `build-all.ps1` silently breaks every future build.
+```bash
+# check-syntax.ps1 — scp this up, then: powershell -ExecutionPolicy Bypass -File C:\A\staging\check-syntax.ps1
+$errs = $null; $tokens = $null
+[System.Management.Automation.Language.Parser]::ParseFile('C:\A\Scripts\build-all.ps1', [ref]$tokens, [ref]$errs) | Out-Null
+if ($errs.Count) { $errs | ForEach-Object { "line $($_.Extent.StartLineNumber): $($_.Message)" } } else { 'SYNTAX OK' }
+```
+Run it against the **known-good original first** as a control — if that also reports errors, your checker is wrong, not the file.
+
+**3. Edit locally, SCP back — never string-replace in place.** PowerShell's `$content.Replace(...)` silently no-ops on CRLF/LF mismatch. Pull the file with `scp`, edit it, `md5` both ends to confirm a clean transfer, `copy /Y` a `.bak-YYYYMMDD` first.
+
+**4. `$_` and `$var` get eaten by bash** in `ssh "powershell -Command \"...\""`. Put the script in a file and use `powershell -File` instead of fighting the escaping.
+
 ## Reading Files from VM via SSH
 
 ```bash

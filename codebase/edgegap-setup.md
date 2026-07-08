@@ -58,15 +58,30 @@ Players connect via FQDN:port from deployment
 | **arcastest6** | ENABLED | Legacy (Bevium era) | Main app with 11 old versions |
 | **arcastest_args** | DISABLED | Experimental | Not used |
 
+### ⚠️ Account resource limits DROPPED (discovered 2026-07-08)
+
+**Edgegap now caps this account at `req_cpu` ≤ 1536 (1.5 vCPU) and `req_memory` ≤ 3072 MiB (3 GiB).** The versions below were created in Feb 2025 at 2048/4096, which was permitted then. Something changed on the account (plan/tier/trial — **not yet investigated**).
+
+**Why this breaks builds silently:** Edgegap **revalidates the entire version object on any PATCH.** So even though `build-all.ps1` sends only `{"docker_tag": ...}`, the API re-checks CPU/memory, finds them over quota, and rejects the whole request:
+```json
+{"message": "You cannot allocate more CPU than 1536 units (1.50 vCPU), You cannot allocate more memory than 3072 MiB (3.00 GiB)"}
+```
+The 2026-07-08 build hit this. `build-all.ps1` treated it as a **warning**, printed `UNIFIED BUILD PIPELINE COMPLETE!`, and wrote `COMPLETE` to `status.txt` — leaving a **5-month-old server image** live against a freshly-uploaded Steam client. Caught only by manually GET-ing the version.
+
+- **Fixed in the script** (2026-07-08): the PATCH now **reads the tag back** and a mismatch/exception is **fatal** → `status.txt = EDGEGAP_PATCH_FAILED:<tag>` + `exit 1`.
+- **`testing-server` was downsized to 1536/3072** to unblock. ⬜ **A UE5 dedicated server on 3 GiB is untested under load — watch for OOM in a real match.**
+- ⬜ **TODO: find out why the limits dropped** and whether 2048/4096 can be restored.
+- **Any PATCH to the other versions below will fail the same way** until they're downsized too.
+
 ### App Hierarchy: arcas-champions
 
 ```
 App: arcas-champions
 └── Version: testing-server              ← stable name, referenced by matchmaker
     ├── docker_image: arcas-champions-n3tkvcfhbvhf/arcastest6
-    ├── docker_tag: 2026-02-14_20-13     ← changes when we push new builds
-    ├── req_cpu: 2048 (2 vCPUs)
-    ├── req_memory: 4096 (4 GB)
+    ├── docker_tag: 2026-07-08_17-24     ← changes when we push new builds
+    ├── req_cpu: 1536 (1.5 vCPUs)        ← downsized 2026-07-08 (account cap)
+    ├── req_memory: 3072 (3 GB)          ← downsized 2026-07-08 (account cap)
     ├── max_duration: 30 min
     ├── inject_context_env: true
     ├── ports: [{7777, UDP, "gameport"}]

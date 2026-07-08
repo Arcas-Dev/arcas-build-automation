@@ -2,7 +2,9 @@
 
 **Created**: 2026-06-28 (deep-dive, task 1 of progression-system investigation)
 **Scope**: How the Barracks Vault UI gets weapons/totems and how it relates to `GET_Vault`. Read-only investigation, no code changed.
-**Related**: [[progression-system-plan]], `database-structure.md`
+**Related**: [[progression-system-plan]], [[progression-system-audit-2026-07]], `database-structure.md`
+
+> **Re-verified 2026-07-09** (audit): the core finding below — `GET_Vault` weapon/totem owned IDs are fetched then **discarded** at `Vault.cpp:103` (`// TODO: AddWeaponSlots and AddTotemSlots ez.`), UI shows the full local `DT_AllVaultItems` — **still holds line-for-line** on `deploy/steam-testing` @ b0dcbfb69. This is the highest-leverage seam for gameplay-unlocks.
 
 ---
 

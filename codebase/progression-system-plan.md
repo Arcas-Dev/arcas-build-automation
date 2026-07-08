@@ -1,7 +1,9 @@
 # Arcas Champions — Progression System Plan
 
+> **⏱️ 2026-07-09 reality check** — a full 5-agent code audit ([[progression-system-audit-2026-07]]) confirms **nothing from Phases 1–4 below is built**. What now exists beyond this plan's original snapshot: a **client UI shell** (`W_PlayerProgression` + slot + level-up popup, real `DT_PlayerProgressionItems` content) and a **dead-code mock XP subsystem** (`UExperiencePointSubsystem` — zero callers, editor-only, cooked builds = XP0/Level0). This plan's open question "does the client have progression UI scaffolding?" → **yes, a stub shell.** The award→persist→own→gate→grant back half is entirely unbuilt. Start at the `Vault.cpp:103` ownership seam.
+
 **Created**: 2026-06-24
-**Status**: Planning / pre-build
+**Status**: Planning / pre-build (client UI shell scaffolded 2026-07; backend unbuilt)
 **Scope decisions (locked with Dan, 2026-06-24)**:
 1. **Account-level progression first** — player XP, level, currency, rewards keyed to `playerid`. Champion-level progression is a later phase.
 2. **Gameplay unlocks** — shrink the starter kit; players earn weapons/totems by leveling. (Changes the current "everyone gets everything at registration" model.)

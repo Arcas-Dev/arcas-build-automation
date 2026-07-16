@@ -69,6 +69,7 @@ Players connect via FQDN:port from deployment
 The 2026-07-08 build hit this. `build-all.ps1` treated it as a **warning**, printed `UNIFIED BUILD PIPELINE COMPLETE!`, and wrote `COMPLETE` to `status.txt` — leaving a **5-month-old server image** live against a freshly-uploaded Steam client. Caught only by manually GET-ing the version.
 
 - **Fixed in the script** (2026-07-08): the PATCH now **reads the tag back** and a mismatch/exception is **fatal** → `status.txt = EDGEGAP_PATCH_FAILED:<tag>` + `exit 1`.
+- **Verify-race fix** (2026-07-15, `cc72611`): that read-back was ~1s after the PATCH and hit Edgegap's **async revalidation** — the GET can return an **empty/stale `docker_tag`** for a second or two, so a fully-good deploy **false-failed** as `EDGEGAP_PATCH_FAILED`. The verify now **retries 6× with a 3s delay** before declaring failure (keeps the real over-quota protection, drops the false negatives). The 2026-07-15 build (`docker_tag 2026-07-15_21-56`, Steam BuildID 24228841) was actually fine — client+server in sync — despite the reported failure.
 - **`testing-server` was downsized to 1536/3072** to unblock. ⬜ **A UE5 dedicated server on 3 GiB is untested under load — watch for OOM in a real match.**
 - ⬜ **TODO: find out why the limits dropped** and whether 2048/4096 can be restored.
 - **Any PATCH to the other versions below will fail the same way** until they're downsized too.
@@ -79,7 +80,7 @@ The 2026-07-08 build hit this. `build-all.ps1` treated it as a **warning**, prin
 App: arcas-champions
 └── Version: testing-server              ← stable name, referenced by matchmaker
     ├── docker_image: arcas-champions-n3tkvcfhbvhf/arcastest6
-    ├── docker_tag: 2026-07-08_17-24     ← changes when we push new builds
+    ├── docker_tag: 2026-07-15_21-56     ← changes when we push new builds
     ├── req_cpu: 1536 (1.5 vCPUs)        ← downsized 2026-07-08 (account cap)
     ├── req_memory: 3072 (3 GB)          ← downsized 2026-07-08 (account cap)
     ├── max_duration: 30 min

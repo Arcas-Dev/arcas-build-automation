@@ -15,7 +15,17 @@
 | `champions` | Individual champions with skins, stats, names |
 | `playervault` | Player's unlocked weapons and totems |
 | `playerloadouts` | 5 saved loadout configurations per player |
-| `playerrank` | Player MMR/ranking |
+| `playerrank` | Player MMR/ranking + voting power |
+| `playerprogression` | **NEW (2026-07)** Account XP + level (see Progression System below) |
+| `progression_levels` | **NEW (2026-07)** Editable XP→level curve config |
+
+> **Live-drift note (verified 2026-07-15 via `ADMIN_ViewSchema`):** since the Feb doc,
+> `playerrank` gained `delegatedvotingpower` + `permanentvotingpower` (int, default 0);
+> `playerprofile.authtype` is now enum `authtypeenum` (was TEXT). Test mirrors exist for
+> all prefixed tables (`testchampions`, `testplayervault`, `testplayerloadouts`,
+> `testplayerrank`, `testplayerprogression`) — `LIKE ... INCLUDING ALL` copies, no FK
+> constraints, driven by the dual-write `initialize_player_associations()` trigger.
+> There is **no** `testplayerprofile` — test tables share the single prod `playerprofile`.
 
 ---
 
@@ -77,6 +87,50 @@
 |--------|------|-------|
 | playerid | INT | FK → playerprofile.playerid |
 | rank | INT | Default 2500 |
+| delegatedvotingpower | INT | Default 0 (SkillStaking) |
+| permanentvotingpower | INT | Default 0 (SkillStaking) |
+
+### playerprogression (NEW 2026-07)
+| Column | Type | Notes |
+|--------|------|-------|
+| playerid | INT | PK + FK → playerprofile.playerid |
+| total_xp | BIGINT | **Authoritative**, cumulative, monotonic. Default 0 |
+| level | INT | Denormalized cache, derived from `progression_levels`. Default 1 |
+| pending_levelup | BOOLEAN | Default FALSE. Set TRUE (sticky) by `awardMatch` on a level rise; `GET_Profile` reads-and-clears it atomically → client fires the unlock popup once (`LeveledUp`) |
+| updated_at | TIMESTAMPTZ | Default now() |
+
+### progression_levels (NEW 2026-07)
+| Column | Type | Notes |
+|--------|------|-------|
+| level | INT | PK |
+| xp_required | BIGINT | **Cumulative** XP to reach this level |
+
+Global config (no test mirror). Seeded L1–L30 by `ADMIN_InitializeProgression`.
+Curve: `xp_required(L) = 400*(L-1) + 50*(L-2)*(L-1)` → L2=400, L3=900 … L30=52,200.
+Editable live (UPDATE rows or re-run the init endpoint) with no migration —
+level is always recomputed from this table, never stored authoritatively.
+
+---
+
+## Progression System (XP + Levels)
+
+**Design pattern:** cumulative XP is the single source of truth; level is derived
+from the `progression_levels` curve. Level cached in `playerprogression.level` for
+cheap reads + level-up detection, recomputed on every XP write.
+
+**XP awards (server-authoritative):** win = +100 XP, loss = +40 XP, via
+`POST_MatchResults {win:[ids], loss:[ids], ranked?:bool}`. The `ranked` flag also
+applies ±25 MMR. `POST_RankedMatchResults` is now a thin wrapper (ranked=true).
+Shared logic in `awardMatch(win, loss, ranked)` in server.js.
+
+**Client display (Pattern A):** `GET_Profile` returns `Level`, `LevelXP` (into
+current level), `LevelXPRequired` (size of current band). Client derives
+"XP to next" = `LevelXPRequired − LevelXP`; bar fill = `LevelXP / LevelXPRequired`.
+At max level `LevelXPRequired = 0`. Client never knows the curve (a future
+`GET_ProgressionConfig` endpoint would let it cache the full ladder if needed).
+
+**Admin:** `ADMIN_InitializeProgression` (idempotent; creates tables + curve +
+backfill + extends trigger). `ADMIN_ViewSchema` (read-only full schema dump).
 
 ---
 

@@ -10,7 +10,7 @@ The system is now **half-built**: the **award → persist → level → notify**
 
 ## ✅ BUILT this session (verified live on test)
 
-### Backend — `ArcasChampionsAPI/server.js` (deployed to test Cloud Run; NOT yet committed to git)
+### Backend — `ArcasChampionsAPI/server.js` (committed `testing` `e7ef428`; auto-deploys to `arcaschampionsapi-test` via the git trigger)
 - **`playerprogression`** table: `playerid` PK/FK, `total_xp` BIGINT (authoritative, cumulative), `level` INT (derived cache), `pending_levelup` BOOL, `updated_at`. Test mirror `testplayerprogression`. 829 players backfilled at L1.
 - **`progression_levels`** config table: `level` PK, `xp_required` BIGINT (cumulative). Seeded L1–30 by formula `xp_required(L) = 400*(L-1) + 50*(L-2)*(L-1)` (L2=400, L3=900 … L30=52,200). Editable, no migration — level is always recomputed from this table.
 - **XP award**: `POST_MatchResults {win:[ids], loss:[ids], ranked?:bool}` — win **+100**, loss **+40**, recomputes level, sets `pending_levelup=TRUE` (sticky) on a level rise. `ranked:true` also does ±25 MMR. `POST_RankedMatchResults` is now a thin wrapper (ranked=true). Shared logic = `awardMatch(win, loss, ranked)`.

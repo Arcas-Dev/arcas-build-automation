@@ -291,34 +291,44 @@ try {
 
     Log "Edgegap PATCH returned OK - verifying the tag actually applied..."
 
-    # A 200 is NOT proof the tag changed. Read it back. (2026-07-08: a PATCH was
-    # rejected for over-quota req_cpu/req_memory while the pipeline still reported
-    # COMPLETE, leaving a 5-month-old server image live against a fresh client.)
+    # A 200 is NOT proof the tag changed. Read it back. (2026-07-08: an over-quota PATCH
+    # was silently rejected, leaving a 5-month-old server image live against a fresh client.)
     #
-    # But Edgegap revalidates the whole version object asynchronously, so an immediate
-    # GET can return an empty/stale docker_tag for a second or two. (2026-07-15: a
-    # fully-good deploy false-failed here because the read-back ran ~1s after PATCH and
-    # saw ''.) Poll with a short delay before declaring failure - this keeps the
-    # real-failure protection while tolerating the revalidation window.
+    # Edgegap revalidates the whole version asynchronously, so the read-back has to tell three
+    # states apart (observed across builds 2026-07-15/18):
+    #   - live tag == our new tag  -> success.
+    #   - live tag == '' (empty)   -> STILL revalidating; the PATCH was ACCEPTED (200) and the
+    #                                 tag settles later (seen to take >18s). NOT a failure.
+    #   - live tag == some OTHER   -> PATCH REJECTED, the OLD image is still live (the real
+    #     non-empty tag             over-quota failure). Hard fail.
+    # So: poll for our tag; then judge by the FINAL state (empty = warn, wrong = fail).
     $liveTag = ''
-    $maxAttempts = 6
+    $maxAttempts = 12
     for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
-        Start-Sleep -Seconds 3
+        Start-Sleep -Seconds 5
         $applied = Invoke-RestMethod `
             -Uri "https://api.edgegap.com/v1/app/$EdgegapApp/version/$EdgegapVersion" `
             -Method Get `
             -Headers $headers
         $liveTag = $applied.version.docker_tag
         if ($liveTag -eq $dockerTag) { break }
-        Log "  verify attempt $attempt/$maxAttempts - Edgegap reports docker_tag '$liveTag', waiting..."
+        Log "  verify attempt $attempt/$maxAttempts - live docker_tag '$liveTag', waiting..."
     }
 
-    if ($liveTag -ne $dockerTag) {
-        throw "Edgegap still reports docker_tag '$liveTag', expected '$dockerTag' after $maxAttempts attempts"
+    if ($liveTag -eq $dockerTag) {
+        Log "Edgegap PATCH SUCCESS (verified)"
+        Log "Version '$EdgegapVersion' now points to docker_tag '$dockerTag'"
     }
-
-    Log "Edgegap PATCH SUCCESS (verified)"
-    Log "Version '$EdgegapVersion' now points to docker_tag '$dockerTag'"
+    elseif ([string]::IsNullOrEmpty($liveTag)) {
+        # Empty = accepted but slow to revalidate (settles asynchronously). Do NOT fail the build.
+        Log "WARNING: Edgegap still reports an empty docker_tag after $maxAttempts attempts."
+        Log "The PATCH was accepted (200); Edgegap revalidates asynchronously and the tag should"
+        Log "settle to '$dockerTag' shortly. Treating as success - GET the version later if unsure."
+    }
+    else {
+        # A different NON-empty tag = PATCH rejected, old image still live.
+        throw "Edgegap PATCH rejected: version still on old docker_tag '$liveTag', expected '$dockerTag' (likely over-quota req_cpu/req_memory)"
+    }
 } catch {
     Log "ERROR: Edgegap PATCH failed: $_"
     Log ""

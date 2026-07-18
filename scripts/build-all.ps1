@@ -51,6 +51,13 @@ $EdgegapToken = "2dd0f063-c76d-4e30-af80-942dbc8fe75c"
 $EdgegapApp = "arcas-champions"
 $EdgegapVersion = "testing-server"
 
+# Edgegap Container Registry (for the pre-build capacity guard)
+$RegistryHost = "registry.edgegap.com"
+$RegistryImage = "arcas-champions-n3tkvcfhbvhf/arcastest6"
+$RegistryUser = 'robot$arcas-champions-n3tkvcfhbvhf+client-push'
+$RegistryToken = "SFiNqps7tu5e3efrWCj9AzxR03c8YfAk"
+$MaxRegistryImages = 8   # stop the build if the registry already has >= this many images
+
 # Cloud Build
 $CloudBuildConfig = "C:\A\Builds\LinuxServer\cloudbuild.yaml"
 $GCPProject = "arcas-champions"
@@ -79,6 +86,43 @@ Log '=========================================='
 Log "Timestamp: $timestamp"
 Log "Docker tag: $dockerTag"
 Log "Log file: $logFile"
+Log ''
+
+# ============================================
+# PHASE 0: REGISTRY CAPACITY GUARD
+# ============================================
+# Edgegap's container registry is capped (~21 GB) and we CANNOT auto-delete (the push
+# robot has no delete permission, and the storage quota is not exposed via API). Each
+# server image is ~2 GB, so guard by image COUNT: if the registry is already full, stop
+# now and tell the user to delete an old image via the portal, rather than waste a
+# ~25 min build whose docker push would fail at the end.
+Log '=========================================='
+Log 'PHASE 0: REGISTRY CAPACITY GUARD'
+Log '=========================================='
+
+try {
+    $pair = "${RegistryUser}:${RegistryToken}"
+    $basic = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($pair))
+    $tagsResp = Invoke-RestMethod -Method Get `
+        -Uri "https://$RegistryHost/v2/$RegistryImage/tags/list" `
+        -Headers @{ Authorization = "Basic $basic" }
+    $imageCount = ($tagsResp.tags | Measure-Object).Count
+    Log "Registry '$RegistryImage' has $imageCount image(s); guard limit is $MaxRegistryImages."
+
+    if ($imageCount -ge $MaxRegistryImages) {
+        Log ''
+        Log "ERROR: Registry is at capacity ($imageCount / $MaxRegistryImages images, ~2 GB each vs the ~21 GB cap)."
+        Log 'Delete an old image in the Edgegap portal, then re-run the build:'
+        Log '  Edgegap dashboard -> Container Registry -> arcastest6 -> delete the oldest tag(s).'
+        UpdateStatus "REGISTRY_FULL:$imageCount"
+        exit 1
+    }
+}
+catch {
+    # Do not block the build on a transient registry API hiccup - just warn and continue.
+    Log "WARNING: registry capacity check failed ($_). Continuing without the guard."
+}
+
 Log ''
 
 # ============================================

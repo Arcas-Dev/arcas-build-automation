@@ -416,3 +416,58 @@ ssh -i ~/.ssh/arcas_build_key daniel@34.65.146.42 "cmd /c 'type C:\A\status.txt'
 ssh -i ~/.ssh/arcas_build_key daniel@34.65.146.42 \
   "powershell -Command \"Get-Content 'C:\A\Logs\build-*.log' -Tail 50 | Select-Object -Last 50\""
 ```
+
+---
+
+## Headless uasset inspection: the gotchas (2026-09-13)
+
+The `-ExecutePythonScript` commandlet is the way to read numeric uasset properties without RDP.
+Three things cost time the first few runs.
+
+**1. Quote the script path through a `.bat`, not over SSH.** SSH lands in PowerShell, which mangles
+the quoting on `-ExecutePythonScript="..."` and the editor then starts normally and runs nothing.
+The symptom is a clean log with no Python output and no error. Write a one-line `.bat` on the VM:
+
+```bat
+@echo off
+C:\UE5.5\Engine\Binaries\Win64\UnrealEditor-Cmd.exe C:\A\ApeShooter\NewApeShooter\NewApeShooter.uproject -ExecutePythonScript="C:/A/staging/x.py" -EnablePlugins=PythonScriptPlugin -unattended -nopause -nosplash -NullRHI -stdout > C:\A\Logs\x.log 2>&1
+```
+
+**2. Have the script write its own results file.** `print()` output is not reliably captured in the
+redirected log. Collect lines in a list and write them to `C:/A/staging/result.txt`, flushing after
+each section, and wrap everything in try/except. A script that throws before its final write leaves
+the PREVIOUS run's file in place, which reads as a stale, confusing result.
+
+**3. Filter the log case-sensitively.** `Select-String` is case-insensitive by default, so a pattern
+like `ASSET:` matches every `.uasset:` line in the engine's own warnings and buries the output.
+
+### What is and is not readable
+
+| Readable | Not readable |
+|----------|--------------|
+| Any `get_editor_property` on a DataAsset, including TSet/TArray of `TSubclassOf` | `WidgetBlueprint.Animations` (protected in Python) |
+| CDO values via `unreal.get_default_object(cls)`, e.g. every weapon's `ItemId` | `WidgetBlueprint.parent_class` (not exposed) |
+| `AssetRegistry.get_referencers` / `get_dependencies` | Blueprint graph logic (use `strings` for node names) |
+
+For widget animations and Blueprint graphs, `strings` on the uasset still beats the commandlet: it
+reveals node names like `ForEachLoop`, `Array_Get` and the property path
+`WeaponsClassListDataAsset:PrimaryWeaponClasses`, which is enough to tell whether a Blueprint
+enumerates a data asset or just looks one entry up.
+
+---
+
+## Levelling a test account
+
+**Go through `POST_MatchResults`, never a direct XP write.** Level rewards are granted only when a
+level is *crossed*, so setting `total_xp` in the database gives the level with an empty vault. The
+match path grants every level crossed in one go.
+
+- Auth header is the server token, not the admin key.
+- Max XP per match is **220** (win 100 + performance cap 120, i.e. 40 kills and 0 deaths).
+- Body: `{"win":[<id>],"loss":[],"ranked":false,"stats":[{"playerId":<id>,"kills":40,"deaths":0,"assists":0}]}`
+- Cumulative XP per level is the `XP_REQUIRED` array in `ADMIN_InitializeProgression` (`server.js`).
+  Level 67 is 35,283 and the cap, level 70, is 38,970.
+
+Done on 2026-09-13 for player 12: level 33 to 67 took 125 matches, all 200s, and granted the
+complete set of 21 weapons, 10 totems and 9 mods plus 210 bananas and 11 vials. The cost is 125
+fabricated wins in `match_history`, which will skew anything read from that table.

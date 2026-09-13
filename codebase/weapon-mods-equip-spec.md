@@ -1,6 +1,6 @@
 # Weapon Mods: the Equip Stage
 
-**Status**: BUILD SPEC, written 2026-09-13, implemented in the same session.
+**Status**: ✅ **BUILT, SHIPPED AND VERIFIED 2026-09-13.** See the AS-BUILT block at §10.
 **Predecessor**: `weapon-mods-tuning-table-spec.md` (the visualise stage, shipped).
 **Branch**: `deploy/steam-testing`.
 
@@ -167,3 +167,96 @@ and hand the player the base weapon in the match.
 - **The empty `UTuningTableModSlotButton`** from the Bevium era still has commented-out stubs for
   exactly this. Logic lives on `UTuningTable` instead, which is the only place that knows the
   active weapon and the player's owned mods. Delete the stub or leave it.
+
+---
+
+# 10. AS-BUILT (2026-09-13)
+
+Everything in §5 was built, compiled clean, shipped and verified against the live database the
+same day. Commits on `deploy/steam-testing`:
+
+| Commit | What |
+|--------|------|
+| `637045060` | Mod slot hover binding + Tuning Table stat bars (the two bugs found before equip) |
+| `76f30030a` | **The equip stage.** C1-C9, 11 files, new `WeaponVariantUtils.h` |
+| `434ab32dd` | Fitted mod moved to the MOD SLOT panel; empty hover box removed |
+
+Steam demo build `2026-09-13_14-07` (BuildID 25283887), Edgegap tag verified live.
+
+## 10.1 It works, proven against the database
+
+Read back through `ADMIN_GetVault` after in-game testing, on two accounts:
+
+| Player | Slot | Saved id | Meaning |
+|--------|------|----------|---------|
+| 11 | Primary | `102703` | Twin Barrel + High Capacity |
+| 11 | Utility | `203802` | R-Tree G + Healing Ammo |
+| 11 | Melee | `304903` | Axe + Resourceful |
+| 12 | Primary | `103703` | Melon Rifle + High Capacity |
+| 12 | Utility | `203803` | R-Tree G + Demolition |
+| 12 | Melee | `301903` | Machete + Resourceful |
+
+Player 11's primary changed from `102701` to `102703` between two reads, which proves the
+**replace** path, not just first-fit. Champion and totems came through untouched, which matters
+because the save path rebuilds the whole loadout from the champion card.
+
+All six passed `validate_loadout` on write, so ownership and class-fit were enforced
+server-side and not merely trusted from the client.
+
+**Still unproven**: the dedicated server spawning the modded weapon in a match. Everything above
+is menu plus database.
+
+## 10.2 Two deviations from the spec, both from the first in-game pass
+
+**E4 was implemented on the wrong widget.** The spec said the fitted mod goes in "the slot in the
+top right". It was built on `ActiveWeaponSlot`, which is the slot inside the bottom-left active
+weapon panel, not the `ModSlot` panel top right. The bottom-left panel then showed a mod while its
+own title named the weapon. Corrected in `434ab32dd`: the bottom-left shows the selected weapon and
+the top-right `ModSlot` shows the fitted mod, hidden when there is none, cleared on open so the
+designer's placeholder art never shows.
+
+`ModSlot` is bound `BindWidgetOptional` and logs a warning when missing, so a rename in
+`W_TuningTable` costs the feedback rather than failing the whole screen.
+
+**The hover panel drew an empty white rectangle** under a mod's description. That frame is
+`VideoPlayerWidget`; totems fill it with a preview and mods have nothing for it. Now collapsed when
+an item has neither `Video` nor `VideoPreview`.
+
+## 10.3 Learnings worth keeping
+
+🔑 **The champion card's slot is the save store, not just a picture.** `GetConfiguration()` reads
+the id back off the slot's item. Any UI path that cannot produce a slot item silently saves the
+previous value. This is the single most useful fact about this screen.
+
+🔑 **`SetItem` on `UPlayerInfoComponent` silently no-ops on an unresolved id.** `ApplyWeaponId`
+therefore reads the class back and compares before touching the UI. A silent no-op there is exactly
+how a client loadout and a server vault drift apart.
+
+🔑 **`SetUnequipStatus` raises `bIsEquip`, which suppresses `NativeOnClicked`.** Correct for a vault
+tile, fatal for a mod: you could fit one and never remove it. Hence `SetFittedStatus`.
+
+🔑 **`OnBarrackLoadout_UpdateEvent` is Blueprint's, not ours.** It is `BlueprintAssignable` and
+drives the 3D preview. The new `OnBarracksLoadoutEdited` is separate, and deliberately not
+`OnPlayerInfoUpdate`, which also fires during a loadout load.
+
+⚠️ **C4458 shadowing bit twice in one session.** Adding a `ModSlot` member made the existing
+`ModSlot` loop variable an error under warnings-as-errors. Check for a name collision whenever a
+new member shares a name with a local.
+
+⚠️ **Read errors from the MAIN build log, never the `-err.log`.** The error log is empty on a failed
+compile. Count occurrences of `': error'` in the main log.
+
+## 10.4 Marco's remaining items (none blocking)
+
+- Fitted-highlight animation on `W_ModSlot`. Deferred by Dan: "right now its ok if we can't tell,
+  as the icon in the top right should change or be empty based on the equip status and thats
+  enough." §10.2 covers the feedback in the meantime.
+- **`BarracksWeaponStand`** is a Blueprint that `ForEachLoop`s over
+  `WeaponsClassListDataAsset:PrimaryWeaponClasses`, which went from 11 entries to 41 when the
+  variants were registered. The surrounding nodes (`Break Weapons`, `Get Lyra Inventory Item
+  Definition From FLoadout`) suggest an id lookup rather than a display of every entry, so it is
+  probably fine. It is the asset's **only** referencer. Worth opening once.
+- The "no mods unlocked" line.
+- Several variant asset names have typos (`ID_Machete_LuckyStike_C`, `ID_Sniper__HighCapacityMod_C`,
+  `ID_NailSMG_HIghCapacityMod_C`, and two missing the `Mod` suffix). Cosmetic only: everything
+  resolves by `ItemId`, never by asset name.

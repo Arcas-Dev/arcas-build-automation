@@ -7,6 +7,13 @@
 
 ---
 
+> 📐 **Target ERD** (where this schema is heading): `arcas-champions/docs/target-erd.drawio.svg`.
+> Merges the live schema below with [[progression-ranking-spec]]: `championprestige`,
+> `prestige_tiers`, `prestige_rewards`, `progression_config`, `prestige_payouts`, plus new
+> columns on `playervault` (consumables, skins, weaponmods), `champions` (skin_id,
+> vial_points_spent), `match_history` (champid, prestige_delta) and `progression_levels`
+> (reward_type/id/qty).
+
 ## Tables
 
 | Table | Purpose |
@@ -26,6 +33,12 @@
 > `testplayerrank`, `testplayerprogression`) — `LIKE ... INCLUDING ALL` copies, no FK
 > constraints, driven by the dual-write `initialize_player_associations()` trigger.
 > There is **no** `testplayerprofile` — test tables share the single prod `playerprofile`.
+
+> **Live-drift note (2026-09-09, verified via `ADMIN_ViewSchema` after `ADMIN_InitializeLoadoutSystem`):**
+> `playervault`/`testplayervault` + `primarymods, secondarymods, meleemods INT[]`; new `playerconsumables`/`testplayerconsumables`;
+> `progression_levels` + `reward JSONB` (one reward per level: `{type, id}` for weapon/totem/mod, `{type, qty}` for banana/vial, NULL at L1; 69 rows filled);
+> `testplayerloadouts` now has the 5 `validate_loadout` triggers (it had none) and its `loadoutN` DEFAULT is the starter kit `{Weapons:[101,201,303], Totems:[401,501,602]}`.
+> `validate_loadout()` is v2 (table-aware via `TG_TABLE_NAME`); `initialize_player_associations()` v3 (prod: legacy full vault, test: starter kit, + consumables rows).
 
 ---
 
@@ -71,6 +84,21 @@
 | damagetotems | INT[] | Array of totem IDs |
 | utilitytotems | INT[] | Array of totem IDs |
 | supertotems | INT[] | Array of totem IDs |
+| primarymods | INT[] | **NEW 2026-09-09** owned mods for primary weapons (7xx), default `{}` |
+| secondarymods | INT[] | **NEW 2026-09-09** owned mods for utility weapons (8xx), default `{}` |
+| meleemods | INT[] | **NEW 2026-09-09** owned mods for melee weapons (9xx), default `{}` |
+
+A loadout weapon slot may hold a **variant id** `base×1000+mod` (101701 = Pistol + Double Tap); unmodded weapons keep the base id. `validate_loadout()` v2 requires the base in its class array **and** the mod in the matching mod array (mod fits ⇔ `mod/100−6 = base/100`). See [[loadout-system-build-spec]] AS-BUILT.
+
+### playerconsumables (NEW 2026-09-09)
+| Column | Type | Notes |
+|--------|------|-------|
+| playerid | INT | PK, FK → playerprofile.playerid |
+| bananas | INT | Default 0 — accrued by level rewards `{type:'banana', qty}` |
+| vials | INT | Default 0 — accrued by level rewards `{type:'vial', qty}` |
+| updated_at | TIMESTAMPTZ | |
+
+Test mirror `testplayerconsumables`. Accrue only; nothing spends them yet. Written by `awardMatch → grantLevelRewards → grantConsumable` (upsert) and `ADMIN_GrantItem {bananas|vials}`.
 
 ### playerloadouts
 | Column | Type | Notes |

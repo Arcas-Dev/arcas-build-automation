@@ -140,6 +140,19 @@ In the same function, the comment says ties remove from the bot's own team. The 
 ### F6. Ranked matches are filled with bots
 This follows from §3: the dedicated server always fills to `MaxPlayerCount`, and `BotsOption` is ignored there. It's worth an explicit decision, because bots in ranked matches affect MMR and the SkillStaking/prediction-market story. **Check**: how `SendMatchResults` treats bot kills and bot-filled teams.
 
+### F7. The waiting queue kept players who left — ✅ CONFIRMED in code, FIXED `00639088e` (2026-11-01, not yet compiled)
+**Mechanism.** `WaitingPlayersQueue` was `TQueue<TObjectPtr<ALyraPlayerController>>`. `TQueue` is invisible to GC, and on the server `TObjectPtr` is a raw pointer, so a queued player who quit left a dangling entry that was neither kept alive nor cleared. At the next bot death `RequestPlayerRestartNextFrame` ran `Cheat_RemoveBot` first, then used the dead entry:
+- before GC (~61 s): the bot is deleted, nobody spawns, `ALyraPlayerController::SetGenericTeamId`'s `ensureAlways` fires, and the team stays a member down;
+- after GC: use-after-free (server crash or silent corruption).
+
+**Reachable** in TDM, Control Point and Eggsplosion: non-seamless travel makes every client log in again, warmup starts on server time, so a slow loader lands in `Playing`, is queued with no feedback (no pawn, frozen view) and is likely to quit. Brawl doesn't respawn bots mid-round, so no crash there (but see the open items below).
+
+**Fix (3-agent review + 1 diff review).** Queue holds `TWeakObjectPtr` (reads invalid as soon as the controller is destroyed, before GC); dead entries at the front are popped before the bot branch; the player is dequeued **before** `Cheat_RemoveBot`, and the bot is removed only for a live player, otherwise it respawns normally. Enqueue site unchanged (implicit conversion). Live queued player: same behaviour as before.
+
+**Test (Marco, PIE):** normal TDM unchanged; 2 players, player 2 joins after warmup, quits while queued, kill a bot → bot respawns, no ensure; same with player 2 staying → spawns on the dead bot's team.
+
+**Still open (deferred by Dan, "small things later"):** Brawl queued player stuck for the whole match; `Logout` spawns a replacement bot for a queued leaver (team gets an extra bot); a queued player spawned another way stays queued; no feedback/timeout for a queued player; the debug log "Are there Waiting Players?" can say yes for leavers until the next bot death.
+
 ### Minor
 - `CustomBotSpawnPoint` bots go into the same `SpawnedBotList`, so a later `SpawnBots()` (a level reset) would destroy them. Fine in tutorials today, but a trap if spawn points are used in a mode with warmup.
 - On a dedicated server, bot `AimAccuracy` is the BP or class default (0.33). The "AI Aim Accuracy" game setting only binds through a local player (`LyraPlayerBotController.cpp` `PostInitializeComponents`), so it only affects listen-server/PIE bots, and there it uses the host's setting.

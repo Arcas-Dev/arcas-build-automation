@@ -128,7 +128,9 @@ Side findings from the asset pass: `B_ShooterGame_TDMBIG` uses the Lyra base spa
 ### F2. A reconnecting player can switch teams (likely, gameplay-visible)
 §4 step 2 moves the dequeued player to the team of **whichever bot dies first**, not to the team they left. Because `Logout` already put a replacement bot on their old team, a reconnect can land them on the other side. **Confirm**: 2 humans vs bots, one leaves and rejoins, and a bot on the other team dies first.
 
-### F3. Latent out-of-range read in `RemoveExtraBots` (low likelihood, server crash)
+### F3. Out-of-range read in `RemoveExtraBots` (server crash) — ✅ CONFIRMED reachable, FIXED `e929b98ae` (2026-11-01, not yet compiled)
+> **4-agent review.** Reachable in a real match, round-based modes only (`ResetRoundLevel` has one caller, `ScoringGameStateComponentBase.cpp:766`, for non-final rounds: Brawl/Elimination, Eggsplosion; TDM has none; Control Point likely 1 round). `GetNumPlayers` counts queued humans, not bots, so a human arriving after warmup (or a drop + rejoin: `Logout` adds a bot) leaves the list above `EffectiveBotCount`. **Recipe**: 4v4, 7 humans at warmup end → T1 4 humans, T2 3 humans + 1 bot; 8th joins → T1 (tie → first team); next round reset Effective = 0, list = 1, the only bot is on T2 → `SpawnedBotList[-1]` → fatal `RangeCheck` (Array.h, DO_CHECK on in Development). Also with even teams once ≥2 bots must go: strict `>` from 0 makes the first `TeamIds` key win ties, and skipped bots are never revisited. **Fix**: `i >= 0` in the loop condition, nothing else; the extra bot stays that round (5v4 in the recipe). A team-agnostic fallback pass was **rejected** in review: it would delete the smaller team's only bot (5v3); one over `MaxPlayerCount` is harmless (bots hold no connection). Rest of the round-reset path audited: no other reachable fatal; unchecked casts at `:241` (`RestartAllBots`) and `:331` (`BotPlayerState`) only fail if the bot controller/PlayerState classes change. `ExperienceName` in `ResetRoundLevel` is unused. Original note follows.
+
 `ArcasBotCreationComponent.cpp:300`: `for (i = Num-1; SpawnedBotList.Num() > EffectiveCount; --i)`. The loop condition never checks `i >= 0`. A bot is removed only if it is on the "team with most players". If that team has **no** bots, nothing is removed, `i` goes to -1, and `SpawnedBotList[-1]` hits the TArray range check, which crashes the server in a Development build. It needs more humans + bots than `MaxPlayerCount` at a round reset (queued joiners) with every bot on the smaller team. That's rare without backfill, but possible with reconnects in Brawl. **Fix**: add `i >= 0` to the loop condition, and fall back to removing from any team on a second pass.
 
 ### F4. The tie-break comment is wrong
@@ -310,3 +312,22 @@ All of 8.7 shipped in **one push** (Dan: no steps, no feature branch). Only `Cus
 - With custom respawn on, the soft classes stay loaded until `EndPlay` (a 2nd `SpawnBot()` call then spawns right away instead of being ignored).
 - `RespawnStatus` (Details panel, read-only) summarises the setup; respawn fields are greyed out via `CanEditChange` when a blocking GE is in the list.
 - Log category: `LogCustomBotSpawnPoint`.
+
+---
+
+## §9 Pick a cosmetic directly on `CustomBotSpawnPoint` — BUILT `68df11fb3` (2026-11-01) ✅ VERIFIED by Marco
+
+> AS-BUILT: `CosmeticToOverrideWith` added as designed below (`TSubclassOf<AActor>` + `AllowedClasses` meta, EditCondition `bOverrideMesh`). In `OverrideBotMesh` it builds the `FLyraCharacterPart` by field (the struct has no constructor) and returns before the profile/skin-team path. Empty = unchanged, so tutorials are untouched.
+
+**Ask (Marco):** on `B_CustomBotSpawnPoint`, a field to pick any cosmetic from `Content/Characters/ApeChampion/Cosmetics/Player/` (B_BasSentinel, B_Bonzette, B_FemaleApe_Alpha/Elite/Renegade, B_MaleApe_Alpha/Base/Elite/Renegade, B_SargerSkullfist) instead of Mesh Profile + Skin Team.
+
+**How it works today:** `OverrideBotMesh` (`CustomBotSpawnPoint.cpp:835`) → `UCharacterMeshPickerComponent::PickCharacterMeshBasedOnTeam(SkinTeam, Profile)`, which looks up `Profile → SkinTeam → Gender` in the controller's `CharacterMeshesClassesProfiles` map and calls `SetCurrentCharacterMeshPart(FLyraCharacterPart(Class))`. So a skin is reachable only if it sits in that map, and only through a team/gender combo.
+
+**Facts (assets read via LFS):** all 10 Player cosmetics are `ALyraTaggedActor` Blueprints (Alpha → `B_MaleApe_Base` → `LyraTaggedActor`), each a skeletal mesh + `ABP_*_CopyPose`, i.e. exactly the `PartClass` the picker already adds. `SetCurrentCharacterMeshPart` is public, takes any part class and is server-side (authority-gated).
+
+**Design (C++, ~15 lines, 2 files, no Bevium code touched):**
+- `CustomBotSpawnPoint.h`: `UPROPERTY(EditAnywhere, Category="Bot|Mesh", meta=(EditCondition="bOverrideMesh", AllowedClasses="/Script/LyraGame.LyraTaggedActor")) TSubclassOf<AActor> CosmeticToOverrideWith;` ⚠️ `ALyraTaggedActor` is **not exported** from LyraGame, so the property must be `TSubclassOf<AActor>` filtered by meta, not `TSubclassOf<ALyraTaggedActor>` (link error).
+- `OverrideBotMesh`: if `CosmeticToOverrideWith` is set → `SetCurrentCharacterMeshPart(FLyraCharacterPart(CosmeticToOverrideWith))` and return; otherwise today's profile/skin-team path. Respawns already re-call `OverrideBotMesh` (`:757`), so the cosmetic survives custom respawn.
+- Empty field = current behaviour, so existing placed spawn points are unchanged. Team colour override stays separate.
+
+**Risks:** same timing as today's mesh override (the picker re-picks on `OnPlayerInfoUpdate`; the existing override already lives with this and works on ShooterGym). `B_BasSentinel` has no card art but that doesn't matter here. Does not touch players or multiplayer.

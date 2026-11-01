@@ -238,6 +238,8 @@ Broadcast a message on a new `UI.SuperTotemReady` tag from `USynergyTotemGamepla
 
 ## 6. Disguise Totem crash
 
+> **✅ DONE 2026-11-01 (`93552e939`, uncompiled, Marco to PIE-test).** A 4-agent review found the crash lines real but **unreachable on current paths**: death (Lyra death ability + `ResetAbilitiesAndEffects`), round/warmup reset (PlayerState reset force-cancels), disconnect (ASC destroy) all cancel Disguise in the same frame, and `EndAbility` clears the ability's timers (`AbilitySystem.ClearAbilityTimers`), so `Disguise()` never fires on a dead pawn. `GA_Disguise` is data-only, cancellable, no `SurvivesDeath`. The only crash proven in history is the `EndAbility` one fixed by `9ddc4498f`. Dan declared it fixed with hardening: (A) `Disguise()` uses `Cast` + `IsValid` controller and ends the ability (`EndAbility`, not `CancelAbility`, so it works even if not cancellable) instead of `check`/`CastChecked`/unguarded `GetController()`; (B) `OriginalCharacterMeshPart` reset at the top of `ActivateAbility` (before the commit check) so an early end no longer restores the previous activation's part (wrong-team skin after a side swap). Root causes 3-6 below were checked: 3 is safe (ActorInfo owned by the ASC, timers weak-bound), 5 harmless, 4 and 6 not proven, left as is. The ranking below is the original pre-review note.
+
 File: `PLUGIN/Private/AbilitySystem/Abilities/TotemAbilities/DisguiseTotemGameplayAbility.cpp`. Mechanism: montage → server timer → `Disguise()` swaps the Lyra character part via `UCharacterMeshPickerComponent` on the **Controller**, sets replicated `bDisguised`, flips team colour in `OnTeamOrCosmeticsChanged`. Ends on 15 s timer, damage taken, or weapon fire.
 
 ### Root causes, ranked

@@ -90,8 +90,16 @@ crashes on viewport placement; load the map and use the placed actor instead.)
 
 ## 6. Open
 
-- Debug **Print String** in `Content/Weapons/B_Weapon` (shot `LineTraceSingle`), added in Marco's
-  `d841c0f27` "WeaponTrace rework" (2026-07-15). Editor removal; also check the trace's Draw Debug Type = None.
+- **Debug output when shooting: UNRESOLVED.** Marco reports something still prints on every shot.
+  Verified 2026-11-08: **no C++ on the weapon-fire path prints anything.** Dan's July diagnostic
+  `b5a830ced` ([TRACE] UE_LOG per shot) was reverted the same day by `cf9e5bb23` (in HEAD);
+  `2910a4321`/`f85da3aa0` add no logging; Lyra's `DrawDebugLine`s in `LyraGameplayAbility_RangedWeapon.cpp`
+  only draw when the `DrawBulletTraces` cvar is set. The only unguarded C++ debug draws are editor-only and
+  not on shots (`AutoTurretTotemGameplayAbility.cpp:184` spawn trace, `ArtilleryCannonProjectile.cpp:140`).
+  Blueprint suspect: `Content/Weapons/B_Weapon` has a **Print String** next to its shot `LineTraceSingle`,
+  added in Marco's `d841c0f27` (2026-07-15, absent the commit before). Dan said Marco had already dealt with
+  that one. Next step: get the exact on-screen text (or whether it is a drawn line, i.e. a BP trace node with
+  Draw Debug Type != None) and search the assets for it on the VM (`Select-String -SimpleMatch` over `.uasset`).
 - Healing-ammo GEs (Marco `7211269b7`): GrenadeLauncher/RocketLauncher/MadZooka/TrapGun went from
   heal-over-time (3 s, 1.5 s period) to one instant heal of the same base value, i.e. less total healing.
   Dan: parked, not acted on.

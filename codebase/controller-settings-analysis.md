@@ -1,6 +1,14 @@
 # Controller settings: analysis and plan (2026-11-08)
 
-**Status: ANALYSIS ONLY, nothing built. Phase 0 Editor steps sent to Marco 2026-11-10 (D1 + D2 = reorder accepted by Dan); Marco reports Phase 0 works. **Phase 1 (inner/outer sliders) DROPPED by Dan.** Look curve done Editor-only instead of Phase 4 C++: engine `Response Curve - User Defined` (UE 5.5 `InputModifiers.cpp:335`, per-axis `UCurveFloat` ResponseX/Y/Z, **null slot → that axis = 0**) on `IMC_Default_KBM`[19] right after the Lyra dead zone; curve asset over -1..1; steps sent to Marco 2026-11-10. No player setting for the curve. Look presets tuned by Marco in `GamepadAimSensitivity_Normal` (Editor). **Phase 3 ADS BUILT `1a758403c`** (compiled clean on VM): `UAimDownSightsGameplayAbility::AimInputMappingContext` (+Priority 1) pushed on the local player while aiming, removed in `EndAbility`; Marco sets it to `IMC_ADS_Speed` on `GA_AimDownSights`. D6 = **delete the IMC_ADS_Speed mouse row**: verified off the asset it only has `LyraSettingBasedScalar` on `TargetingMultiplier` (no MouseSensitivityX/Y), so it would drop the player's mouse sensitivity while aiming. The ADS stick row needs the same Phase 0 reorder + curve as KBM[19], because it replaces that row while aiming.** Source: Marco's Kanban "Features" card:
+**Status (2026-11-10): items 1-3 DONE, Marco verified in PIE; item 4 (aim assist) next. Committed by Marco `0b4dea06b` "Controller Settings Fix" (not yet cooked, ships with the next `build-all`).**
+- **Phase 0 PARTLY in the committed assets (verified off `0b4dea06b` by headless dump 2026-11-10, §5b):** `IA_Look_Stick` action dead zone removed and the no-op exponential curve gone, **but `IA_Move` still has its 0.2 action dead zone, and Lyra Gamepad Sensitivity is still BEFORE Aim Assist on both stick rows**, so the ±1 clamp is back: Normal..Insane share one top speed and the vertical ×1.3 only works below ~77% stick. Live order KBM[19]: Negate, Lyra DeadZone, Curve, Sensitivity, Scalar(1,1.3), AimInversion, AimAssist. IMC_ADS_Speed stick: Negate, Lyra DeadZone, Sensitivity(ADS), Scalar, AimInversion, AimAssist(ADS), **Curve last** (after aim assist and after sensitivity).
+- **Phase 1 (inner/outer dead zone sliders) DROPPED by Dan**: the existing slider is enough once the hidden 0.2 dead zone is gone.
+- **Curve (replaces Phase 4 C++):** Editor-only, no player setting. Engine `Response Curve - User Defined` (UE 5.5 `InputModifiers.cpp:335`) right after the Lyra dead zone, curve asset `Content/Input/Curves/C_GamePadLookResponse` in X and Y. Curve must cover **-1..1** (the Lyra radial dead zone keeps the sign). 🔴 A **null** ResponseX/Y slot makes that axis 0.
+- **Look presets** retuned by Marco in `GamepadAimSensitivity_Normal`; ADS presets in `ShooterCore/.../GamepadAimSensitivity_Targeting`.
+- **Vertical look boost:** base rates are 300°/s yaw vs 165°/s pitch (`LyraHeroComponent.cpp:35-36`, Lyra design). Marco added an engine **Scalar** modifier last on both stick rows (X 1, Y ~1.3) because the maps use height a lot.
+- **Phase 3 ADS done:** `1a758403c` + `3bd59fc92`. `UAimDownSightsGameplayAbility` pushes `AimInputMappingContext` (= `IMC_ADS_Speed`) on the local player while aiming. 🔴 Lesson: the fields first sat in `Category="Input"`, which `ULyraGameplayAbility` hides (`UCLASS(HideCategories = Input)`, `LyraGameplayAbility.h:98`), so they never showed in the details panel; renamed to **"Aim Input"**. ⚠️ Marco first saw the ADS row ignored until the normal look row was removed: the ADS context priority must be above the default contexts' priority (set on the hero's Default Input Mappings). The IMC_ADS_Speed mouse row (D6) was to be deleted: it only scales by `TargetingMultiplier` and would drop mouse sensitivity while aiming.
+
+Source: Marco's Kanban "Features" card:
 
 1. Add controller deadzone settings
 2. Make controller sensitivity settings work
@@ -223,6 +231,39 @@ Strength:
 | AA9 | No per-weapon scaling; `PullMaxRotationRate` is uncapped | V |
 
 **Never seen working in game.** First step: in PIE, run `lyra.Weapon.DrawAimAssistDebug 1` and `lyra.Weapon.AimAssist.DrawDebugViewfinder 1`. These only work in non-Shipping builds.
+
+### 5b. Deep analysis 2026-11-10 (V = code read + headless dump of the live assets @ `0b4dea06b`)
+
+**Live settings** (both modifiers identical apart from TargetingType): every value is the Lyra struct default except `ReticleDepth` **10000** (Lyra 3000) and `TargetWeightCurve` = `C_AimAssistTargetWeightCurve` (KBM row uses the `/Game/Input/Mappings` copy, ADS row the `/ShooterCore` one). Hip pull/slow inner 0.6 / outer 0.5, ADS 0.7 / 0.4, lerp in 60/s out 4/s, `PullMaxRotationRate` 0 (uncapped), `SlowMinRotationRate` 0, `StrengthScale` 1, `MaxNumberOfTargets` 6, require input, pull + strafe pull + slow + dynamic slow + radial look rates all on. Filter: friendlies excluded, dead excluded, no excluded classes/tags. `SensitivityLevelTable` = Normal table (hip) / Targeting table (ADS), `MoveInputAction` = `IA_Move`.
+
+**Per frame (client only, gamepad right-stick row only):**
+1. View data from the PC: camera transform, projection, pawn location + control rotation, own team from `ALyraPlayerState`.
+2. **Candidates:** box overlap on `Lyra_TraceChannel_AimAssist`, centred on the **pawn** (not the camera), rotated to control rotation, 80×80 cm cross-section, `ReticleDepth/FOVScale` long → reaches only **~40-50 m forward**.
+3. **Filter** (`DoesTargetPassFilter`): not self; along view, in range; *if ACharacter*: same `ALyraPlayerState` team → out, dead → out; tag/class exclusions (none set).
+4. **Shape:** `UAimAssistTargetComponent::GatherTargetOptions` → `TargetShapeComponent` is not a UPROPERTY, so it is never set in BPs and falls back to `FindComponentByClass<UShapeComponent>()` = the actor's first shape (on apes the root `CollisionCylinder` 35×90). **Head and Body both resolve to the same capsule** → two identical targets, head/body sizes ignored (V code; component order I).
+5. **Screen test:** target's projected bounds must intersect the targeting reticle (1200×675 at depth = most of the screen); then inner/outer reticle flags. Reticles are world-space sizes at `ReticleDepth`: outer 80 cm at ~100 m ≈ **±0.23°**, inner 20 cm ≈ ±0.06° (Lyra's 3000 depth ≈ ±0.76°). **So assist only engages when the crosshair is already on, or within ~8 cm at 20 m of, the target's screen box.** It helps you stay on, not acquire.
+6. Max 6 by score (weight, view angle, distance), then **line of sight** camera → target eye point on Visibility (async, a frame late).
+7. **Weights:** time under the outer reticle → `TargetWeightCurve` → **normalised to sum 1**. With one target the weight is 1 almost immediately, so the curve's ramp only matters between several targets.
+8. **Strength** = Σ(inner/outer strength × weight) × `StrengthScale` × **sensitivity preset value** (`GetSensitivtyScalar`), lerped (in 60/s, out 4/s).
+9. **Pull** (only while look or move stick is past the dead zone; move-only scaled by strafe amount): `RotationNeeded` = the rotation that keeps the target at the same spot relative to you given **its movement and yours** since last frame. Pull = that × strength. **It is tracking compensation, never a pull toward the target's centre** (no magnetism, no snap).
+10. **Slow** (only while look stick active): look rate × (1 − slow), plus "dynamic" boost when you push the same way the target is moving.
+11. Output = rotational velocity ÷ the modifier's own look rates (900×0.5 = 450°/s yaw, 270 pitch, radially blended to one rate) → **clamped ±1**.
+
+**Defects (new or now verified):**
+| # | Defect | V/I |
+|---|---|---|
+| AA1 | Toggle compiled out in Shipping (cheat cvar under `#if !UE_BUILD_SHIPPING`, `:469`) | V |
+| AA3 | **Friendly devices pull/slow your aim.** `ATeamDevice : ALyraCharacterWithAbilities` (an ACharacter with no player state), so the team check finds no `ALyraPlayerState` and lets it through: Turret, Artillery (275×440 capsule), Spotter Chimp, Team Healing | V |
+| AA4 | **Disguise is given away:** Disguise only swaps the skin (`DisguiseTotemGameplayAbility.cpp:135-150`), team unchanged, no exclusion tag → the reticle sticks to a "friendly-looking" enemy | V |
+| AA5 | Head/Body duplicate: both resolve to the root capsule | V (order I) |
+| AA6 | Overlap tube from the pawn, reticle/LOS from the camera; shoulder offset > ~62 cm sideways → no assist on a target under the crosshair | I |
+| AA8 | ±1 clamp after sensitivity (current order) | V |
+| AA10 | **Strength × sensitivity preset overflows:** hip inner slow 0.6 × Insane 2.5 = 1.5 → slow rate goes **negative** → the stick turns the view **backwards** over a target. ≥1 from Fast+ (1.75) up | V (code) |
+| AA11 | ADS assist is **weaker** than hip: ADS strength × Targeting table (Normal 0.5) → 0.35 vs hip 0.6 | V |
+| AA12 | Pull is under-delivered: converted to stick units at 450°/s but the hero turns at 300 (yaw) / 165 (pitch) → ~67% yaw, ~37% pitch of the computed pull | V (code) |
+| AA13 | ADS row runs the look curve after aim assist, reshaping the pull/slow output | V |
+| AA14 | `ReticleDepth` 10000 makes both assist zones ~3× tighter than Lyra's tuning | V |
+
 
 ---
 

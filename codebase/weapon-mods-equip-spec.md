@@ -260,3 +260,9 @@ compile. Count occurrences of `': error'` in the main log.
 - Several variant asset names have typos (`ID_Machete_LuckyStike_C`, `ID_Sniper__HighCapacityMod_C`,
   `ID_NailSMG_HIghCapacityMod_C`, and two missing the `Mod` suffix). Cosmetic only: everything
   resolves by `ItemId`, never by asset name.
+
+---
+
+## Polish 2026-11-01: open on the clicked weapon (`11cf82a94` + `27d1949a9`) ✅ VERIFIED by Marco
+On first open the Tuning Table showed the designer's placeholder art on `Mod1..3` until a weapon was clicked, because nothing selected a weapon on open (`SetModSlots` only ran from `SetActiveWeapon`). Fix: `NativeConstruct` collapses the mod buttons and selects the primary; new `UTuningTable::SelectWeaponOfCategory(EUserCombatBarrackType)` (same as clicking that weapon's button); `UHoverItemSlotDescription` binds a second `AfterPush` handler (`OnTuningTablePushed`) that selects the hovered item's category, so Fine Tune opens on primary / utility / melee directly.
+- Follow-up (same day): the remaining **1-frame placeholder flash on first open** was not the mock backend: `UVaultSlotButton::SetItem` async-loads the icon/background, so a never-loaded texture leaves the material's placeholder up for a frame (later opens hit memory). Opt-in `SetHideIconUntilLoaded(true)` hides `SlotImage` until the pending loads finish (restores its original visibility); enabled by `UTuningTable::NativeConstruct` for the 3 weapon, 3 mod and MOD SLOT buttons and by `UTuningTableActiveWeapon::SetWeapon`. Also a stale-load guard (a load for a replaced item no longer overwrites the newer icon), which applies to every vault button.

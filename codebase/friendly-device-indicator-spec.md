@@ -122,3 +122,21 @@ Steps 1-4 are one session for us; Marco can't start 6 before 4 (the parent class
 
 - Marco's setup `d8f7b9add`: `W_FriendlyTotem_Icon` reparented to `UFriendlyIndicatorWidget` (`IconImage` bound, the old `PlayAnimationForward` removed, so no colour-track conflict); component on `B_AutoTurretSynergyDevice`, `B_TeamHealingSynergyDevice`, `B_ArtilleryCannon`, `B_AmmoCrate`.
 - **Lessons:** (1) `ULyraTeamStatics` and `IIndicatorWidgetInterface` have no `LYRAGAME_API`, so they can't be used from the plugin; the component reads `ColorParameters` and pushes into the widget. (2) A `UIndicatorDescriptor` can be added to a manager **once** (`SetIndicatorManagerComponent` ensures null), so make a new one per show. (3) `bAutoRemoveWhenIndicatorComponentIsNull` only drops the canvas entry, not the manager entry, so remove in `EndPlay`. (4) Lyra's canvas draws indicators at a **fixed screen size** (child scale 1.0), so the widget scales itself. (5) "It gets bigger" was relative to the shrinking device; measured constant ~0.26× character width.
+
+---
+
+## 7. Works in PIE, missing in builds — FIX PUSHED `4e2ec886e` (2026-11-01), lands with the next `build-all`
+
+**Root cause (very likely): `W_FriendlyTotem_Icon` is never cooked.**
+- The widget is referenced in exactly one place: the **C++ constructor default** of `UFriendlyIndicatorComponent::IndicatorWidgetClass` (`FriendlyIndicatorComponent.cpp:23`, a `TSoftClassPtr`).
+- Blueprints serialize only values that differ from the native default. The 4 device BPs (read via LFS @ `68df11fb3`) contain the component (`FriendlyIndicator_GEN_VARIABLE`) but **no `W_FriendlyTotem_Icon` path**, because Marco never changed the field.
+- The cooker follows references found in saved packages; a native CDO is not a package, so nothing leads it to the widget. `/Game/UI/Hud/Score` is not in `DirectoriesToAlwaysCook` and no primary-asset rule covers it.
+- In PIE the soft class loads straight from disk, so it works. In a build the indicator canvas's async load fails and nothing is drawn: no icon, no crash.
+- Precedent: `+DirectoriesToAlwaysCook=(Path="/BASShooterCore/Game/Tutorial/DataAssets")` in `DefaultGame.ini` was the same class of fix.
+- ⚠️ "Re-select the same widget in the BP" does **not** fix it: a value equal to the native default is still not serialized.
+
+**Fix (1 line, no C++):** `Config/DefaultGame.ini`, `[/Script/UnrealEd.ProjectPackagingSettings]`, next to the existing entries: `+DirectoriesToAlwaysCook=(Path="/Game/UI/Hud/Score")` (11 small HUD widgets, the rest are already cooked via the HUD). Needs a `build-all`. Alternative (more work): empty the C++ default and set the widget in each BP so it serializes.
+
+**Confirm before/after:** the build log/cook output should contain `W_FriendlyTotem_Icon`; a client log without the fix should show a failed load of `/Game/UI/Hud/Score/W_FriendlyTotem_Icon`. Marco's Reference Viewer on the widget should show no referencers.
+
+**Second suspect if the icon is still missing after a cooked fix:** dedicated-server team replication (PIE listen server hides it). Test PIE with Net Mode = Play As Client, 2 players, same team.

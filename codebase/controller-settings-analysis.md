@@ -1,6 +1,6 @@
 # Controller settings: analysis and plan (2026-11-08)
 
-**Status: ANALYSIS ONLY, nothing built. Phase 0 Editor steps sent to Marco 2026-11-10 (D1 + D2 = reorder accepted by Dan); awaiting his PIE result.** Source: Marco's Kanban "Features" card:
+**Status: ANALYSIS ONLY, nothing built. Phase 0 Editor steps sent to Marco 2026-11-10 (D1 + D2 = reorder accepted by Dan); Marco reports Phase 0 works. **Phase 1 (inner/outer sliders) DROPPED by Dan.** Look curve done Editor-only instead of Phase 4 C++: engine `Response Curve - User Defined` (UE 5.5 `InputModifiers.cpp:335`, per-axis `UCurveFloat` ResponseX/Y/Z, **null slot → that axis = 0**) on `IMC_Default_KBM`[19] right after the Lyra dead zone; curve asset over -1..1; steps sent to Marco 2026-11-10. No player setting for the curve.** Source: Marco's Kanban "Features" card:
 
 1. Add controller deadzone settings
 2. Make controller sensitivity settings work
